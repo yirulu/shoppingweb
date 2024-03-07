@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="zh-tw" xmlns:th="http://www.thymeleaf.org">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<head>
+    <meta charset="UTF-8">
+    <title>會員信息輸入表單</title>
+    <style>
+        .error {
+            color: red;
+        }
+
+        .valid {
+            color: blue;
+        }
+
+        /* 當所有輸入正確時，使提交按鈕可用 */
+        #submitButton:disabled {
+            background-color: lightgrey;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="col-md-6">
+            <form th:action="@{/save}" method="post" onsubmit="return validateForm()">
+                <input type="hidden" id="memberId" name="memberId"
+                    th:value="'M' + new java.text.SimpleDateFormat('yy').format(new java.util.Date()) + '123456'" />
+                <label>Email :</label>
+                <input type="email" id="email" name="email" required />
+                <small id="emailError" class="error"></small>
+                <br />
+
+                <label>Name :</label>
+                <input type="text" id="name" name="name" required />
+                <br />
+
+                <label>Password:</label>
+                <div>
+                    <input type="password" id="password" name="password" required
+                        th:class="${passwordValid} ? 'valid' : 'error'" />
+                    <button type="button" id="toggleButton" onclick="togglePasswordVisibility()"
+                        style="cursor: pointer;"><i id="eyeIcon" class="far fa-eye"></i> <span
+                            id="buttonText">ON</span></button>
+                </div>
+                <small id="passwordError" class="error"></small>
+                <br />
+
+                <label>Address :</label>
+                <input type="text" id="address" name="address" required />
+                <br />
+
+                <label>Mobile :</label>
+                <input type="text" id="mobile" name="mobile" required />
+                <small id="mobileError" class="error"></small>
+                <br />
+
+                <label>Birthday :</label>
+                <input type="text" id="birthday" name="birthday" />
+                <small id="birthdayError" class="error"></small>
+                <br />
+
+                <label>身分證後五碼:</label>
+                <input type="text" id="nid" name="nid" required />
+                <small id="nidError" class="error"></small>
+                <br />
+
+                
+                <button type="submit" id="submitButton" disabled>提交</button>
+            </form>
+        </div>
+    </div>
+    <script>
+        let isFormValid = false;
+
+        window.onload = function () {
+            document.getElementById('email').addEventListener('input', validateEmail);
+            document.getElementById('password').addEventListener('input', validatePassword);
+            document.getElementById('mobile').addEventListener('input', validateMobile);
+            document.getElementById('birthday').addEventListener('input', validateBirthday);
+            document.getElementById('nid').addEventListener('input', validateNid);
+        };
+
+        function validateEmail() {
+            var email = document.getElementById('email').value;
+            var emailError = document.getElementById('emailError');
+            var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+            if (!emailRegex.test(email)) {
+                emailError.innerText = '請輸入正確的email格式';
+                emailError.classList.remove('valid');
+                emailError.classList.add('error');
+                isFormValid = false;
+            } else {
+                emailError.innerText = '';
+                emailError.classList.remove('error');
+                emailError.classList.add('valid');
+                isFormValid = true;
+            }
+            updateSubmitButton();
+        }
+
+        function validatePassword() {
+            var password = document.getElementById('password').value;
+            var passwordError = document.getElementById('passwordError');
+
+            var passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
+
+            if (!passwordRegex.test(password)) {
+                passwordError.innerText = '密碼必須至少8位，包含大小寫字母和數字';
+                passwordError.classList.remove('valid');
+                passwordError.classList.add('error');
+                isFormValid = false;
+            } else {
+                passwordError.innerText = '';
+                passwordError.classList.remove('error');
+                passwordError.classList.add('valid');
+                isFormValid = true;
+            }
+            updateSubmitButton();
+        }
+
+        function validateMobile() {
+            var mobile = document.getElementById('mobile').value;
+            var mobileError = document.getElementById('mobileError');
+
+            var mobileRegex = /^09\d{8}$/;
+
+            if (!mobileRegex.test(mobile)) {
+                mobileError.innerText = '手機號碼必須是09開頭，後面為8個數字';
+                mobileError.classList.remove('valid');
+                mobileError.classList.add('error');
+                isFormValid = false;
+            } else {
+                mobileError.innerText = '';
+                mobileError.classList.remove('error');
+                mobileError.classList.add('valid');
+                isFormValid = true;
+            }
+            updateSubmitButton();
+        }
+
+        function validateBirthday() {
+            var birthday = document.getElementById('birthday').value;
+            var birthdayError = document.getElementById('birthdayError');
+
+            var birthdayRegex = /^(19|20)\d{2}[01]\d[0-3]\d$/;
+
+            if (!birthdayRegex.test(birthday)) {
+                birthdayError.innerText = '生日格式必須為西元年YYYYm，月份1~12，日1~31';
+                birthdayError.classList.remove('valid');
+                birthdayError.classList.add('error');
+                isFormValid = false;
+            } else {
+                birthdayError.innerText = '';
+                birthdayError.classList.remove('error');
+                birthdayError.classList.add('valid');
+                isFormValid = true;
+            }
+            updateSubmitButton();
+        }
+
+        function validateNid() {
+            var nid = document.getElementById('nid').value;
+            var nidError = document.getElementById('nidError');
+
+            var nidRegex = /^\d{5}$/;
+
+            if (!nidRegex.test(nid)) {
+                nidError.innerText = '必須是身份證號碼後面5個數字';
+                nidError.classList.remove('valid');
+                nidError.classList.add('error');
+                isFormValid = false;
+            } else {
+                nidError.innerText = '';
+                nidError.classList.remove('error');
+                nidError.classList.add('valid');
+                isFormValid = true;
+            }
+            updateSubmitButton();
+        }
+
+        function togglePasswordVisibility() {
+            var passwordInput = document.getElementById('password');
+            var eyeIcon = document.getElementById('eyeIcon');
+            var toggleButton = document.getElementById('toggleButton');
+            var buttonText = document.getElementById('buttonText');
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                eyeIcon.classList.remove('far', 'fa-eye');
+                eyeIcon.classList.add('fas', 'fa-eye-slash');
+                buttonText.innerText = 'OFF';
+            } else {
+                passwordInput.type = 'password';
+                eyeIcon.classList.remove('fas', 'fa-eye-slash');
+                eyeIcon.classList.add('far', 'fa-eye');
+                buttonText.innerText = 'ON';
+            }
+        }
+
+        function updateSubmitButton() {
+            var submitButton = document.getElementById('submitButton');
+            submitButton.disabled = !isFormValid;
+        }
+
+        function validateForm() {
+            validateEmail();
+            validatePassword();
+            validateBirthday();
+            validateMobile();
+            validateNid();
+            return isFormValid;
+        }
+    </script>
+</body>
+
+</html>
