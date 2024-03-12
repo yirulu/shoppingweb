@@ -8,8 +8,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+
 @Service
-public class ProductService {
+public class ProductService
+{
 
 	@Autowired
 	ProductDAO dao;
@@ -19,48 +21,65 @@ public class ProductService {
 		return dao.findAll(pageable);
 	}
 
-	//查詢所有商品清單
-	public List<Product> getAllProducts() {
-		return dao.findAll();
-	}
-
-	//查詢所有商品by類別id
-	public List<Product> getAllProductsByPtypeid(String ptypeid) {
-		return dao.findByPtypeid(ptypeid);
-	}
-
-	//查詢所有商品by名稱
-	public List<Product> getAllProductsByPname(String pname) {
-		return dao.findByPname(pname);
-	}
-	
 	//新增商品
 	public void addProduct(Product product) {
 		dao.save(product);
 	}
 	
-	//修改商品
-	public void updateProduct(Product product )throws Exception {
-		String productid=product.getProductid();
-		
-		boolean productExists=dao.existsByProductid(productid);
-		
-		if(productExists) {
-			Product existingProduct=dao.findByProductid(productid);
-			existingProduct.setPname(product.getPname());
-			existingProduct.setPqty(product.getPqty());
-			existingProduct.setPtext(product.getPtext());
-			existingProduct.setUnitprice(product.getUnitprice());
-			dao.save(existingProduct);
-		}else {
-			throw new Exception("Product does not exist");
-		}	
+	
+	//查詢-所有商品清單
+		public List<Product> getAllProducts() {
+			return dao.findAll();
+		}
+	
+	// 查詢-根據類別ID查詢商品
+	public List<Product> getAllProductsByPtypeid(String ptypeid){
+		return dao.findByPtypeid(ptypeid);
 	}
 	
-	//刪除商品
-	public void deleteProductBtId(String productid)throws Exception{
+	// 查詢-根據商品名稱查詢商品
+	public Product getProductByPname(String pname) {
+		return dao.findByPname(pname);
+	}
+	
+	// 查詢-根據productid 找出整筆資料
+		public Product getProductById(String productid) throws Exception{
+			Product product=dao.findById(productid).orElse(null);
+			if(product==null) {
+				throw new Exception("Product not found");
+			}
+			return product;
+		}
 		
-		boolean productExists=dao.existsByProductid(productid);
+		
+		//更新商品資料
+		public void updateProduct(String productid,Product updatedProduct)throws Exception{
+			boolean productExists=dao.existsById(productid);			
+			if(productExists) {
+				if(!productid.equals(updatedProduct.getProductid())) {		
+					throw new Exception("Product ID cannot be changed");
+				}
+				
+				Product existingProduct=dao.findById(productid).orElse(null);	
+				if(existingProduct!=null) {
+					existingProduct.setPname(updatedProduct.getPname());
+					existingProduct.setPqty(updatedProduct.getPqty());
+					existingProduct.setPtext(updatedProduct.getPtext());
+					existingProduct.setUnitprice(updatedProduct.getUnitprice());
+					existingProduct.setEnabled(updatedProduct.getEnabled());
+					dao.save(existingProduct);
+				}else {
+					throw new Exception("Product not found");
+				}
+			}else {
+				throw new Exception("Product does not exist");
+			}
+		}
+	
+	
+	//刪除商品
+	public void deleteProductByProductid(String productid) throws Exception{
+		boolean productExists=dao.existsById(productid);
 		
 		if(productExists) {
 			dao.deleteById(productid);
@@ -68,9 +87,6 @@ public class ProductService {
 			throw new Exception("Product does not exist");
 		}
 	}
-	
-	
-	
 	
 	
 }
