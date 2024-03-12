@@ -17,59 +17,72 @@ public class ProductController {
 
 	@Autowired
 	ProductService srv;
+	
+	
+	//新增商品
+		@PostMapping("/products/add")
+		public ResponseEntity<String> addProduct(@RequestBody Product product ){
+			try {
+				srv.addProduct(product);
+				return ResponseEntity.ok("Product added successfully");		
+			}catch(Exception e) {
+				return ResponseEntity.badRequest().body("Product ID is not unique");
+			}			
+		}
 
-	//查詢所有商品清單
+		
+	//查詢-所有商品清單
 	@GetMapping("/products")
 	public List<Product> getAllProducts() {
 		return srv.getAllProducts();
 	}
 	
-	//查詢所有商品by類別id
-	@GetMapping("/products/ptypeid")
-	public List<Product> getAllProductsByPtypeid(@RequestParam String ptypeid) {
+	// 查詢-根據類別ID查詢商品
+	@GetMapping("/products/byptypeid/{ptypeid}")
+	public List<Product> getAllProductsByPtypeid(@PathVariable String ptypeid){
 		return srv.getAllProductsByPtypeid(ptypeid);
 	}
-
-	//查詢所有商品by名稱
-	@GetMapping("/products/bypname")
-	public List<Product> getAllProductsByPname(@RequestParam String pname) {
-		return srv.getAllProductsByPname(pname);
+	
+	// 查詢-根據商品名稱查詢商品
+	@GetMapping("/products/bypname/{pname}")
+	public Product getProductByPname(@PathVariable String pname) {
+		return srv.getProductByPname(pname);
 	}
 	
-	//新增商品
-	@PostMapping("/products/add")
-	public ResponseEntity<String> addProduct(@RequestBody Product product ){
-		try {
-			srv.addProduct(product);
-			return ResponseEntity.ok("Product added successfully");		
-		}catch(Exception e) {
-			return ResponseEntity.badRequest().body("Product ID is not unique");
-		}			
-	}
+	// 查詢-根據productid 找出整筆資料
+		 @GetMapping("/products/{productid}")
+		 public ResponseEntity<?> getProductById(@PathVariable String productid){
+			 try {
+		            Product product = srv.getProductById(productid);
+		            return ResponseEntity.ok(product);
+		        } catch (Exception e) {
+		            return ResponseEntity.badRequest().body("Error getting product: " + e.getMessage());
+		        }
+		 }
 	
-	//修改商品
-	@PostMapping("/products/update")
-	public ResponseEntity<String> updateProduct(@RequestBody Product product ){
-		try {
-			srv.updateProduct(product);
-            return ResponseEntity.ok("Product updated successfully"); 	
-		}catch (Exception e) {
-			return ResponseEntity.badRequest().body("Product ID is not unique");
-		}
-                     
-	}	
+		 
+		//更新商品
+			@PostMapping("/products/update/{productId}")
+			public ResponseEntity<String> updateProduct(@PathVariable String productId, @RequestBody Product updatedProduct) {
+			    try {
+			        srv.updateProduct(productId, updatedProduct);
+			        return ResponseEntity.ok("Product updated successfully");
+			    } catch (Exception e) {
+			        return ResponseEntity.badRequest().body("Error updating product: " + e.getMessage());
+			    }
+			}
 	
+		 
 	//刪除商品
 	@DeleteMapping("/products/{productid}")
-	public ResponseEntity<String> deleteProductBtId(@PathVariable String productid){
+	public ResponseEntity<String> deleteProductById(@PathVariable String productid){
 		try {
-			srv.deleteProductBtId(productid);
+			srv.deleteProductByProductid(productid);
 			return ResponseEntity.ok("Product deleted successfully");
-		}catch (Exception e){
-			return ResponseEntity.badRequest().body("Error deleting product:"+e.getMessage());
+		}catch(Exception e) {
+			return ResponseEntity.badRequest().body("Error deleting product: " + e.getMessage());
 		}
-		
-	
-		
 	}
+
+	
 }
