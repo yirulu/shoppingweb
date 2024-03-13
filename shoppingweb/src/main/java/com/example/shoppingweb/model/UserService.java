@@ -42,7 +42,6 @@ public class UserService {
 		return dao.queryByEmployeeID(employeeID);
 	}
 
-	
     // 新增使用者
     public User addUser(User user) {
 		//資料庫最大會員編號
@@ -50,9 +49,8 @@ public class UserService {
     	String max=Users.stream().map(u->u.getEmployeeID()).toList().stream().max(Comparator.comparing(i->i)).get();
     	//編輯訂單編號
     	Integer serialNum = Integer.parseInt(max.substring(1,4))+1;
-    	user.setEmployeeID("U"+replenishNum(serialNum.toString(),3));
-    	
-
+    	user.setEmployeeID("U"+String.format("%03d", serialNum));
+ 
      	user.setCreatedAt(LocalDateTime.now());
     	user.setUpdatedAt(LocalDateTime.now());
         return dao.save(user);
@@ -87,16 +85,6 @@ public class UserService {
 			throw new Exception("User does not exist");
 		}	
      }
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	//數字長度不足,自動補0
-	public static String replenishNum(String inum,Integer NumberDigits)
-	{
-		while(inum.length()<NumberDigits) {	
-		inum="0"+inum;	
-		}	
-		return inum  ;			
-	}
-   
     
 }    
 
