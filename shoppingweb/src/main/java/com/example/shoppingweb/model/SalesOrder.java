@@ -33,7 +33,7 @@ public class SalesOrder {
 
 	private String employeeId;
 	
-	@OneToMany(cascade= {CascadeType.ALL})
+	@OneToMany
 	@JoinColumn(name="sorderid")
 	private List<OrderDetail> orderDetails;
 	

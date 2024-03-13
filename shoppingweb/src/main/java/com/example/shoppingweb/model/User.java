@@ -1,6 +1,6 @@
 package com.example.shoppingweb.model;
 
-import java.util.Date;
+import java.util.*;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -25,7 +25,25 @@ public class User {
     private String editUser;
  
 	private Boolean enabled; //是否啟用
-    public User() {    }
+	
+	@OneToMany
+	@JoinColumn(name="employeeid")
+	private List<SalesOrder> salesOrder;
+	
+	@OneToMany
+	@JoinColumn(name="employeeid")
+	private List<OrderDetail> orderDetails;
+	
+	@OneToMany
+	@JoinColumn(name="employeeid")
+	private List<Product> products;
+	
+	@OneToMany
+	@JoinColumn(name="employeeid")
+	private List<ProductType> productTypes;
+	
+	
+    public User() {}
 	public User(String employeeID, String department, String name, String email, String userName, String password,
 			LocalDateTime createdAt, String createdUser, LocalDateTime updatedAt, String editUser, Boolean enabled) {
 		this.employeeID = employeeID;
@@ -114,6 +132,31 @@ public class User {
 	public void setEnabled(Boolean enabled) {
 		this.enabled = enabled;
 	}
+	
+//	public List<SalesOrder> getSalesOrder() {
+//		return salesOrder;
+//	}
+//	public void setSalesOrder(List<SalesOrder> salesOrder) {
+//		this.salesOrder = salesOrder;
+//	}
+//	public List<OrderDetail> getOrderDetails() {
+//		return orderDetails;
+//	}
+//	public void setOrderDetails(List<OrderDetail> orderDetails) {
+//		this.orderDetails = orderDetails;
+//	}
+//	public List<Product> getProducts() {
+//		return products;
+//	}
+//	public void setProducts(List<Product> products) {
+//		this.products = products;
+//	}
+//	public List<ProductType> getProductTypes() {
+//		return productTypes;
+//	}
+//	public void setProductTypes(List<ProductType> productTypes) {
+//		this.productTypes = productTypes;
+//	}
 
 	
 }
