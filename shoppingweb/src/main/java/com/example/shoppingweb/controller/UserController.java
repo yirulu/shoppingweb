@@ -28,14 +28,19 @@ public class UserController {
 		return srv.getAllUsers();
 	}
 	
-	//手動執行 http://localhost:8080/users/bb
+	//手動執行 http://localhost:8080/users/userName/bb
 	//【使用者帳戶+密碼】查使用者個人資料
-	@GetMapping("/users/{userName}")
+	@GetMapping("/users/userName/{userName}")
 	public List<User> getAllUsersByUserName(@PathVariable String userName) {
 		return srv.getAllUsersByUserName(userName);
 	}
 
-	
+	//手動執行 http://localhost:8080/users/employeeID/U005
+	@GetMapping("/users/employeeID/{employeeID}")
+	public User getqueryByEmployeeID(@PathVariable("employeeID") String employeeID){
+		return srv.getqueryByEmployeeID(employeeID);
+		
+	}	
 	//手動執行 http://localhost:8080/users/login/zz/zz
 	//【使用者帳戶+密碼】查使用者個人資料
 	@GetMapping("/users/login/{userName}/{password}")
@@ -44,13 +49,6 @@ public class UserController {
 		
 	}
 
-	/*
-	//手動執行 http://localhost:8080/users/employeeID?employeeID=u001
-	@GetMapping("/users/employeeID")
-	public List<User> getAllUsersByEmployeeID2(@RequestParam String employeeID) {
-		return srv.getAllUsersByEmployeeID2(employeeID);
-	}
-*/
 
 	/*手動執行 http://localhost:8080/users
 	 * 
