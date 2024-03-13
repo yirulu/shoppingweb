@@ -6,7 +6,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
+
+import com.example.shoppingweb.model.OrderDetail;
 import com.example.shoppingweb.model.OrderDetailDAO;
+import com.example.shoppingweb.model.Product;
 import com.example.shoppingweb.model.SalesOrder;
 import com.example.shoppingweb.model.SalesOrderDAO;
 import com.example.shoppingweb.model.SalesOrderService;
@@ -14,6 +17,7 @@ import com.example.shoppingweb.model.SalesOrderService;
 import java.util.*;
 @RestController
 @RequestMapping("/sales")
+@CrossOrigin("*")
 public class SalesOrderController {
 	@Autowired
 	SalesOrderDAO dao;
@@ -34,8 +38,16 @@ public class SalesOrderController {
 		return sales;
 	}
 	
+	@GetMapping("/querySalesById/{memberId}")
+	public List<SalesOrder> getBymemberid(@PathVariable("memberId")Integer memberId) {
+		ModelAndView model=new ModelAndView("querySalesById");
+		List<SalesOrder> sales=dao.findBymemberId(memberId);
+		model.addObject("sales",sales);
+		return sales;
+	}
+	
 	//search order by order status 
-	@GetMapping("/querySales/{status}")
+	@GetMapping("/querySalesByStatus/{status}")
 	public List<SalesOrder> getByStatus(@PathVariable("status")String status) {
 		ModelAndView model=new ModelAndView("salesIndex");
 		List<SalesOrder> sales=dao.findBystatusCode(status);
@@ -44,22 +56,32 @@ public class SalesOrderController {
 	}
 	
 	//search order by order date
-	@GetMapping("/querySales/{date}")
+	@GetMapping("/querySalesByDate/{date}")
 	public List<SalesOrder> getByDate(@PathVariable("date")String date) {
 		ModelAndView model=new ModelAndView("salesIndex");
-		List<SalesOrder> sales=dao.findBygenerateDate(date);
+		String d=date.replace("-","")+"%";		
+		List<SalesOrder> sales=dao.findBygenerateDateLike(d);
 		model.addObject("sales",sales);
 		return sales;
 	}	
 	
-	//create a order
+	//create a order & orderDetail
 	@PostMapping("/addSales")
-	public List<SalesOrder> createSales(@ModelAttribute("SalesOrder") SalesOrder sales) {
+	public List<SalesOrder> createSales(@RequestBody SalesOrder sales) {
 //		ModelAndView model=new ModelAndView("salesIndex");
 		String sId=SalesOrderService.calculateSalesOrderNum(SalesOrderService.getCurrentDate(),dao.findAll());
 		sales.setSorderId(sId);
 		sales.setGenerateDate(SalesOrderService.getCurrentDateTime());		
-		dao.save(sales);		
+		//dao.save(sales);
+//		List<OrderDetail> details=new ArrayList<>();
+		int index=1;
+		for(OrderDetail c:sales.getOrderDetails()) {			
+			c.setSdetailId(sId+index);
+			c.setSorderId(sId);
+			c.setSIndex(index++);			
+			dDao.save(c);
+		}		
+		dao.save(sales);
 		return getAll();
 	}
 	
