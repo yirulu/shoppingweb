@@ -3,6 +3,7 @@ package com.shoppingweb.model;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 
 public interface UserDAO extends JpaRepository<User, String>{
@@ -16,5 +17,9 @@ public interface UserDAO extends JpaRepository<User, String>{
 	User findByEmployeeID(String employeeID);
 	
 	boolean existsByEmployeeID(String employeeID);
+
+    // 自定義SQL查詢
+    @Query(value = "select * from user where employeeID = ?1", nativeQuery = true)
+    User queryByEmployeeID(String employeeID);
 	
 }

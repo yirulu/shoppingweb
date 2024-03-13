@@ -37,12 +37,12 @@ public class UserService {
 		return dao.findByUserNameAndPassword(userName, password);	
 		
 	}
-
-/*	
-	public List<User> getAllUsersByEmployeeID2(String employeeID) {
-		return dao.findByEmployeeID2(employeeID);
+	
+	public User getqueryByEmployeeID(String employeeID) {
+		return dao.queryByEmployeeID(employeeID);
 	}
-*/
+
+	
     // 新增使用者
     public User addUser(User user) {
 		//資料庫最大會員編號
