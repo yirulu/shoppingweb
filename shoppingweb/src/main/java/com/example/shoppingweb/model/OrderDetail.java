@@ -9,8 +9,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderDetail {
-	@Id
-	
+	@Id	
 	private String sdetailId;//NN
 	
 	private String sorderId;//NN FK from salesOrder
@@ -23,4 +22,5 @@ public class OrderDetail {
 	private Integer quantity;//NN
 	
 	private Integer subTotal;//NN
+	private String employeeId;
 }

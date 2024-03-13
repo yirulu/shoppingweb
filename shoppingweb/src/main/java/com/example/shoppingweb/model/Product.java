@@ -1,6 +1,7 @@
 package com.example.shoppingweb.model;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import jakarta.persistence.*;
 
@@ -20,6 +21,7 @@ public class Product {
 	private String employeeid;
 	private LocalDateTime createtime;
 	private Boolean enabled;
+	
 	
 	public Product() {
 	}

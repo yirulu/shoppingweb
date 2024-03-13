@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
+import java.util.*;
 @Entity
 @Table(name="members")
 @Data
@@ -33,6 +33,10 @@ public class Member {
 	private String nid;
 	@Column(name="active")
 	private Boolean active; //是否啟用
+	
+	@OneToMany
+	@JoinColumn(name="memberid")
+	private List<SalesOrder> salesOrders;
 	
 	@Override
 	public String toString() {
