@@ -33,6 +33,7 @@ public class UserController {
 	//【使用者帳戶+密碼】查使用者個人資料
 	@GetMapping("/users/userName/{userName}")
 	public List<User> getAllUsersByUserName(@PathVariable String userName) {
+		System.out.println("getAllUsersByUserName:"+userName);
 		return srv.getAllUsersByUserName(userName);
 	}
 
