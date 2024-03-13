@@ -1,4 +1,4 @@
-package com.shoppingweb.model;
+package com.example.shoppingweb.model;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
