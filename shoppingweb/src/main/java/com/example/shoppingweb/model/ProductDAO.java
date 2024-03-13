@@ -8,11 +8,6 @@ public interface ProductDAO extends JpaRepository<Product, String> {
 	
 	List<Product> findByPtypeid(String ptypeid);
 	
-	List<Product> findByPname(String pname);
-	
-	Product findByProductid(String productid);
-	
-	boolean existsByProductid(String productid);
-	
+	Product findByPname(String pname);
 
 }
