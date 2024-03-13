@@ -1,5 +1,6 @@
 package com.example.shoppingweb.model;
 
+import java.util.Comparator;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,11 +22,19 @@ public class ProductService
 		return dao.findAll(pageable);
 	}
 
-	//新增商品
-	public void addProduct(Product product) {
-		dao.save(product);
+	//新增商品	
+	public Product addProduct(Product product) {
+		List<Product> products=dao.findAll();
+		
+		products=dao.findAll();
+		String max=products.stream()
+				.map(p->p.getProductid()).toList().stream()			
+				.max(Comparator.comparing(i->i)).get();
+		Integer serialNum=Integer.parseInt(max.substring(1, 4))+1;
+		product.setProductid("P"+String.format("%03d", serialNum));
+		return dao.save(product);
 	}
-	
+
 	
 	//查詢-所有商品清單
 		public List<Product> getAllProducts() {
@@ -87,7 +96,6 @@ public class ProductService
 			throw new Exception("Product does not exist");
 		}
 	}
-	
 	
 }
 	
