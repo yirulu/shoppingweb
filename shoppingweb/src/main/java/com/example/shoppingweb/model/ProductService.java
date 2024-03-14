@@ -46,6 +46,12 @@ public class ProductService
 		return dao.findByPtypeid(ptypeid);
 	}
 	
+	// 查詢-根據主類別(PT1XXX)查詢商品
+		public List<Product> getAllProductsByPmaintypeid(String ptypeid){
+			String maintype = ptypeid.substring(0,3);
+			return dao.findByPtypeidStartingWith(maintype);
+		}
+	
 	// 查詢-根據商品名稱查詢商品
 	public Product getProductByPname(String pname) {
 		return dao.findByPname(pname);
