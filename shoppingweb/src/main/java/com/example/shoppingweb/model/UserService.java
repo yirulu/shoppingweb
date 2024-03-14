@@ -33,7 +33,7 @@ public class UserService {
 		return dao.findByUserName(userName);
 	}
 	
-	public List<User> getAllUsersByUserNameAndPassword(@PathVariable("userName") String userName,@PathVariable("password") String password){
+	public User getAllUsersByUserNameAndPassword(@PathVariable("userName") String userName,@PathVariable("password") String password){
 		return dao.findByUserNameAndPassword(userName, password);	
 		
 	}
@@ -42,18 +42,27 @@ public class UserService {
 		return dao.queryByEmployeeID(employeeID);
 	}
 
+	public User getqueryByUsersByUserNameAndPassword(String userName, String password) {
+		return dao.queryUserNameAndPassword(userName,password);
+	}
+	
     // 新增使用者
-    public User addUser(User user) {
-		//資料庫最大會員編號
-    	Users = dao.findAll();
-    	String max=Users.stream().map(u->u.getEmployeeID()).toList().stream().max(Comparator.comparing(i->i)).get();
-    	//編輯訂單編號
-    	Integer serialNum = Integer.parseInt(max.substring(1,4))+1;
-    	user.setEmployeeID("U"+String.format("%03d", serialNum));
- 
-     	user.setCreatedAt(LocalDateTime.now());
-    	user.setUpdatedAt(LocalDateTime.now());
-        return dao.save(user);
+    public User addUser(User user)throws Exception {
+       	boolean userNameExists=dao.existsByUserName(user.getUserName());
+   		if(! userNameExists) {
+	    	//資料庫最大會員編號
+	    	Users = dao.findAll();
+	    	String max=Users.stream().map(u->u.getEmployeeID()).toList().stream().max(Comparator.comparing(i->i)).get();
+	    	//編輯訂單編號
+	    	Integer serialNum = Integer.parseInt(max.substring(1,4))+1;
+	    	user.setEmployeeID("U"+String.format("%03d", serialNum));
+   	     	user.setCreatedAt(LocalDateTime.now());
+   	    	user.setUpdatedAt(LocalDateTime.now());
+   	        return dao.save(user);
+   		} else {
+   			throw new Exception("UserName is duplicated");
+   		}
+    	
     }
 
     // 更新使用者
