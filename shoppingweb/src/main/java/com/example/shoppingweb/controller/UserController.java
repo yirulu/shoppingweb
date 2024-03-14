@@ -14,6 +14,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.shoppingweb.model.UserService;
+
+import jakarta.servlet.http.HttpSession;
+
 import com.example.shoppingweb.model.*;
 
 @RestController
@@ -21,12 +24,18 @@ import com.example.shoppingweb.model.*;
 public class UserController {
 	@Autowired
 	UserService srv;
-	
+	HttpSession mysession;
+	String loginuser;
 	//手動執行http://localhost:8080/users
 	//查詢全部使用者
 	@GetMapping("/users")
 	public List<User> getAllUsers() {
-		return srv.getAllUsers();
+	  if(mysession!=null)
+	  {
+		  
+	  }
+	   
+	   return srv.getAllUsers();
 	}
 	
 	//手動執行 http://localhost:8080/users/userName/bb
@@ -43,18 +52,36 @@ public class UserController {
 		return srv.getqueryByEmployeeID(employeeID);
 		
 	}	
+	
+/*	
 	//手動執行 http://localhost:8080/users/login/zz/zz
 	//【使用者帳戶+密碼】查使用者個人資料
 	@GetMapping("/users/login/{userName}/{password}")
-	public List<User> getAllUsersByUserNameAndPassword(@PathVariable("userName") String userName,@PathVariable("password") String password){
+	public User getAllUsersByUserNameAndPassword(@PathVariable("userName") String userName,@PathVariable("password") String password){
 		return srv.getAllUsersByUserNameAndPassword(userName, password);	
-		
 	}
-
-
+*/
+	//【使用者帳戶+密碼】查使用者個人資料
+	   @PostMapping("/users/login")
+	    public ResponseEntity findUser(@RequestParam("userName")String userName,@RequestParam("password")String password,HttpSession session)
+	    {
+		   loginuser="No session";
+		   User u=srv.getqueryByUsersByUserNameAndPassword(userName, password);
+	    	if(u!=null) {
+	    		session.setAttribute("loginuser", u);
+	    		mysession=session;
+	    		loginuser=u.getEmployeeID()+","+u.getDepartment();
+	    		
+	    		System.out.println(loginuser+'-'+"session~~"+mysession);
+	    		return ResponseEntity.ok(u);
+	    	}else {
+	    		return ResponseEntity.notFound().build();
+	    	}
+	    }
+	
 	/*手動執行 http://localhost:8080/users
 	 * 
-  {
+    {
         "department": "E",
         "name": "員工11",
         "email": "gg1@gmail.com.tw",
@@ -73,6 +100,20 @@ public class UserController {
 		}			
 	}
 	
+	/*http://localhost:8080/users/U012
+   {
+        "employeeID": "U012",
+        "department": "E",
+        "name": "員工11",
+        "email": "gg1@gmail.com.tw",
+        "userName": "gg1",
+        "password": "gg1",
+        "createdAt": "2024-03-12T23:53:17.302684",
+        "createdUser": null,
+        "updatedAt": "2024-03-13T01:41:46.911867",
+        "editUser": null,
+        "enabled": false
+    }	*/
 	//修改使用者訊息
 	@PostMapping("/users/{employeeID}")
 	public ResponseEntity<String> updateUser(@PathVariable String employeeID,@RequestBody  User user  ){
@@ -84,7 +125,7 @@ public class UserController {
 		}
                      
 	}	
-	
+	//http://localhost:8080/users/U016
 	//刪除使用者訊息
 	@DeleteMapping("/users/{employeeID}")
 	public ResponseEntity<String> deleteProductBtId(@PathVariable String employeeID){
@@ -94,8 +135,23 @@ public class UserController {
 		}catch (Exception e){
 			return ResponseEntity.badRequest().body("Error deleting User:"+e.getMessage());
 		}
-		
+	}
 	
-		
-	}	
+	//http://localhost:8080/users/session
+	//session有值傳→ 員工ID,權限(E員工/M管理者)
+	@GetMapping("/users/session")
+	public  ResponseEntity<String> ChedkMysession(){
+		String mes="No session";
+		try {
+			  if(mysession!=null)
+			  {
+				  mes=loginuser;
+			  }
+			
+			return ResponseEntity.ok(mes);
+		}catch (Exception e){
+			return ResponseEntity.badRequest().body(mes);
+		}
+	}
+
 }
