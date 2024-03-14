@@ -21,15 +21,15 @@ public class ProductController {
 	
 	
 	//新增商品
-		@PostMapping("/products/add")
-		public ResponseEntity<String> addProduct(@RequestBody Product product ){
-			try {
-				srv.addProduct(product);
-				return ResponseEntity.ok("Product added successfully");		
-			}catch(Exception e) {
-				return ResponseEntity.badRequest().body("Product ID is not unique");
-			}			
-		}
+	@PostMapping("/products/add")
+	public ResponseEntity<String> addProduct(@RequestBody Product product ){
+		try {
+			srv.addProduct(product);
+			return ResponseEntity.ok("Product added successfully");		
+		}catch(Exception e) {
+			return ResponseEntity.badRequest().body("Product ID is not unique");
+		}			
+	}
 
 		
 	//查詢-所有商品清單
@@ -43,6 +43,12 @@ public class ProductController {
 	public List<Product> getAllProductsByPtypeid(@PathVariable String ptypeid){
 		return srv.getAllProductsByPtypeid(ptypeid);
 	}
+	
+	// 查詢-根據主類別(PT1XXX)查詢商品
+		@GetMapping("/products/bypmaintypeid/{ptypeid}")
+		public List<Product> getAllProductsByPmaintypeid(@PathVariable String ptypeid){
+			return srv.getAllProductsByPmaintypeid(ptypeid);
+		}
 	
 	// 查詢-根據商品名稱查詢商品
 	@GetMapping("/products/bypname/{pname}")
