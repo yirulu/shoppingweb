@@ -17,7 +17,7 @@ public class OrderDetail {
 	private Integer sIndex;//NN
 	
 	private String productId;//NN FK from product
-	
+	private String pname;
 	private Integer unitPrice;//NN
 	private Integer quantity;//NN
 	
