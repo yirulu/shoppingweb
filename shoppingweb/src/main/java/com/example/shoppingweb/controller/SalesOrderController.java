@@ -63,7 +63,15 @@ public class SalesOrderController {
 		List<SalesOrder> sales=dao.findBygenerateDateLike(d);
 		model.addObject("sales",sales);
 		return sales;
-	}	
+	}
+	
+	//search order by order date
+		@GetMapping("/querysorderId/{sorderId}")
+		public SalesOrder getBySorderId(@PathVariable("sorderId") String sorderId) {
+		    SalesOrder sales = dao.findById(sorderId).get();
+		    return sales;
+		}
+
 	
 	//create a order & orderDetail
 	@PostMapping("/addSales")
