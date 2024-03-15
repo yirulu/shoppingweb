@@ -5,7 +5,7 @@ import java.util.List;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "producttype")
+@Table(name = "product_type")
 
 public class ProductType {
 
@@ -15,7 +15,7 @@ public class ProductType {
 	private String employeeid;
 	private Boolean enabled;
 
-	@OneToMany
+	@OneToMany(cascade = { CascadeType.ALL})
 	@JoinColumn(name = "ptypeid")
 	private List<Product> products;
 
@@ -70,5 +70,13 @@ public class ProductType {
 	public void setProducts(List<Product> products) {
 		this.products = products;
 	}
+
+	@Override
+	public String toString() {
+		return "ProductType [ptypeid=" + ptypeid + ", ptypename=" + ptypename + ", employeeid=" + employeeid
+				+ ", enabled=" + enabled + ", products=" + products + "]";
+	}
+	
+	
 
 }
