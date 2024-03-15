@@ -5,7 +5,7 @@ import java.util.List;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "product_type")
+@Table(name = "producttype")
 
 public class ProductType {
 

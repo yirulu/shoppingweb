@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.example.shoppingweb.model.*;
 
-
+@CrossOrigin("*")
 @RestController
 public class ProductTypeController {
 	
