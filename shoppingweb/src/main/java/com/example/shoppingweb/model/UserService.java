@@ -12,9 +12,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import com.example.shoppingweb.controller.UserController;
+
 @Service
 public class UserService {
 	List<User> Users=new ArrayList<>();
+	public static String userID;
 	
     @Autowired
     private UserDAO dao;
@@ -56,8 +59,14 @@ public class UserService {
 	    	//編輯訂單編號
 	    	Integer serialNum = Integer.parseInt(max.substring(1,4))+1;
 	    	user.setEmployeeID("U"+String.format("%03d", serialNum));
+	    	
+	    	user.setDepartment("E");
+	    	
+	    	user.setCreatedUser(userID);
    	     	user.setCreatedAt(LocalDateTime.now());
+	    	user.setEditUser(userID);
    	    	user.setUpdatedAt(LocalDateTime.now());
+   	    	user.setEnabled(true);
    	        return dao.save(user);
    		} else {
    			throw new Exception("UserName is duplicated");
@@ -71,15 +80,23 @@ public class UserService {
     	boolean userExists=dao.existsByEmployeeID(employeeID);
     	if(userExists) {
     		User existingUser=dao.findByEmployeeID(employeeID);
-    		existingUser.setDepartment(user.getDepartment());
+    		System.out.println(user.getDepartment()+" / "+ user.getEnabled());;
+    		if(user.getDepartment().length()>0) {
+        		existingUser.setDepartment(user.getDepartment());
+    		}
+    		
     		existingUser.setName(user.getName());
     		existingUser.setEmail(user.getEmail());
     		existingUser.setUserName(user.getUserName());
     		existingUser.setPassword(user.getPassword());
 
      		existingUser.setUpdatedAt( LocalDateTime.now());
-    		existingUser.setEditUser(user.getEditUser());
-    		existingUser.setEnabled(user.getEnabled());
+    		existingUser.setEditUser(userID);
+    		
+    		if(user.getEnabled() !=null) {
+    			existingUser.setEnabled(user.getEnabled());
+    		}
+    		
 			dao.save(existingUser);
 		}else {
 			throw new Exception("User does not exist");
