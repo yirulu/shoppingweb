@@ -22,7 +22,9 @@ public class Product {
 	private LocalDateTime createtime;
 	private Boolean enabled;
 	
-	
+	@OneToMany
+	@JoinColumn(name="productid")
+	private List<OrderDetail> details;
 	public Product() {
 	}
 
