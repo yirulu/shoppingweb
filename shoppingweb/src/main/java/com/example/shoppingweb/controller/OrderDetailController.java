@@ -1,5 +1,6 @@
 package com.example.shoppingweb.controller;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
@@ -15,8 +16,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.example.shoppingweb.model.Cart;
 import com.example.shoppingweb.model.OrderDetail;
 import com.example.shoppingweb.model.OrderDetailDAO;
+import com.example.shoppingweb.model.ProductDAO;
 import com.example.shoppingweb.model.SalesOrderDAO;
 
 @RestController
@@ -27,6 +30,8 @@ public class OrderDetailController {
 	OrderDetailDAO dDao;
 	@Autowired
 	SalesOrderDAO dao;
+	@Autowired
+	ProductDAO pDao;
 	@GetMapping("/")
 	public ModelAndView gotoIndex() {
 		ModelAndView model = new ModelAndView("detailIndex");
@@ -35,30 +40,48 @@ public class OrderDetailController {
 	
 	//search all detail
 	@GetMapping("/queryDetail")
-	public List<OrderDetail> getDetail() {
-		ModelAndView model = new ModelAndView("queryDetailByIdp");
+	public List<OrderDetail> getDetail() {		
 		List<OrderDetail> details=dDao.findAll();
 		return details;
 	}
 	
 	//search detail by sorderId
 	@GetMapping("/queryDetail/{id}")
-	public List<OrderDetail> getDetailByOrderid(@PathVariable("id") String id) {
-		ModelAndView model = new ModelAndView("querySalesByIdp");
+	public List<OrderDetail> getDetailByOrderid(@PathVariable("id") String id) {		
 		List<OrderDetail> od=dDao.findBysorderId(id);		
 		return od;
 	}
 	
-//	//create detail
-//	@PostMapping("/addDetail")
-//	public List<OrderDetail> createDetail(@RequestBody List<OrderDetail> details){
-//		ModelAndView model = new ModelAndView("detailIndex");
-//		String soId=dao.findAll().stream().map(t->t.getSorderId()).toList().stream()
-//				.max(Comparator.comparing(s->s)).get();
-//		System.out.print(soId);
-//		details.stream().forEach(d->d.setSorderId(soId));		
-//		return getDetail();
-//	}
+	@PostMapping("/createDetail/{sid}")
+	public List<OrderDetail> createDetail(@PathVariable("sid")String sid, @RequestBody List<OrderDetail> details){		
+		for(OrderDetail o:details ) {
+			o.setSorderId(sid);
+			o.setSdetailId(sid+o.getSIndex());
+			dDao.save(o);
+		}
+		return details;
+	}
+	
+	//create Cart
+	@PostMapping("/createCart")
+	public List<OrderDetail> createCart(@RequestBody List<Cart> carts){
+		System.out.print(carts);
+		List<OrderDetail> details=new ArrayList<>();
+		int index=1;
+		for(Cart c:carts) {
+			String name=pDao.findById(c.getProductId()).get().getPname();
+			Integer unitprice=pDao.findById(c.getProductId()).get().getUnitprice();
+			OrderDetail od=new OrderDetail();
+			od.setSIndex(index++);
+			od.setProductId(c.getProductId());
+			od.setPname(name);
+			od.setQuantity(c.getProductQty());
+			od.setUnitPrice(unitprice);			
+			od.setSubTotal(c.getProductQty()*unitprice);
+			details.add(od);
+		}
+		return details;
+	}
 	
 	@PostMapping("/updateDetail")
 	public List<OrderDetail> updateDetailByid(@RequestParam("amount") Integer amount, @RequestParam("id") String id){
