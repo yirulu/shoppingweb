@@ -10,10 +10,17 @@ import org.springframework.web.servlet.ModelAndView;
 import com.example.shoppingweb.model.OrderDetail;
 import com.example.shoppingweb.model.OrderDetailDAO;
 import com.example.shoppingweb.model.Product;
+import com.example.shoppingweb.model.ProductDAO;
+import com.example.shoppingweb.model.ProductService;
 import com.example.shoppingweb.model.SalesOrder;
 import com.example.shoppingweb.model.SalesOrderDAO;
 import com.example.shoppingweb.model.SalesOrderService;
 
+import jakarta.security.auth.message.callback.PrivateKeyCallback.Request;
+import jakarta.servlet.http.HttpSession;
+import jakarta.websocket.Session;
+
+import java.net.http.HttpRequest;
 import java.util.*;
 @RestController
 @RequestMapping("/sales")
@@ -22,7 +29,12 @@ public class SalesOrderController {
 	@Autowired
 	SalesOrderDAO dao;
 	@Autowired
-	OrderDetailDAO dDao;
+	OrderDetailDAO dDao;	
+	@Autowired
+	ProductDAO pDao;	
+	
+	 
+	
 	@GetMapping("/")
 	public ModelAndView gotoIndex() {
 		ModelAndView model=new ModelAndView("salesIndex");
@@ -75,22 +87,22 @@ public class SalesOrderController {
 	
 	//create a order & orderDetail
 	@PostMapping("/addSales")
-	public List<SalesOrder> createSales(@RequestBody SalesOrder sales) {
+	public SalesOrder createSales(@ModelAttribute SalesOrder sales) {
 //		ModelAndView model=new ModelAndView("salesIndex");
 		String sId=SalesOrderService.calculateSalesOrderNum(SalesOrderService.getCurrentDate(),dao.findAll());
 		sales.setSorderId(sId);
 		sales.setGenerateDate(SalesOrderService.getCurrentDateTime());		
 		//dao.save(sales);
 //		List<OrderDetail> details=new ArrayList<>();
-		int index=1;
-		for(OrderDetail c:sales.getOrderDetails()) {			
-			c.setSdetailId(sId+index);
-			c.setSorderId(sId);
-			c.setSIndex(index++);			
-			dDao.save(c);
-		}		
+//		int index=1;
+//		for(OrderDetail c:sales.getOrderDetails()) {			
+//			c.setSdetailId(sId+index);
+//			c.setSorderId(sId);
+//			c.setSIndex(index++);			
+//			dDao.save(c);
+//		}		
 		dao.save(sales);
-		return getAll();
+		return sales;
 	}
 	
 	//change order status to specific by be selected
@@ -103,5 +115,48 @@ public class SalesOrderController {
 		update.stream().forEach(u->dao.save(u));
 		return getAll();
 	}
+	
+	//create cart
+//	@GetMapping("/addCart/{pid}")
+//	public  List<OrderDetail> addCartById(@PathVariable("pid") String pid,HttpSession session) {		
+//		List<OrderDetail> details;	
+//		
+//		if(session.getAttribute("cart")==null) 
+//		{
+//			details=new ArrayList<>();
+//			Product p=pDao.findById(pid).get();
+//			OrderDetail od=new OrderDetail();
+//			od.setProductId(p.getProductid());
+//			od.setPname(p.getPname());
+//			od.setQuantity(1);
+//			od.setUnitPrice(p.getUnitprice());			
+//			od.setSubTotal(p.getUnitprice());
+//			details.add(od);
+//			session.setAttribute("cart",details);
+//		}
+//		else 
+//		{
+//			details=(List<OrderDetail>)session.getAttribute("cart");
+//			OrderDetail od1 = details.stream().filter(d->d.getProductId().equals(pid)).findAny().orElse(null);
+//			if(od1!=null)
+//			{
+//				od1.setQuantity(od1.getQuantity()+1);
+//			}
+//			else
+//			{
+//				Product p=pDao.findById(pid).get();
+//				OrderDetail od=new OrderDetail();
+//				od.setProductId(p.getProductid());
+//				od.setPname(p.getPname());
+//				od.setQuantity(1);
+//				od.setUnitPrice(p.getUnitprice());			
+//				od.setSubTotal(p.getUnitprice());
+//				details.add(od);				
+//			}	
+//			session.setAttribute("cart",details);
+//		}
+//		
+//		return details;
+//	}
 
 }

@@ -26,7 +26,5 @@ public class OrderDetail {
 	private Integer subTotal;//NN
 	private String employeeId;
 	
-	@ManyToOne
-	@JoinColumn(name="productid")
-	private Product product;
+	
 }
