@@ -1,5 +1,7 @@
 package com.example.shoppingweb.model;
 
+import java.util.List;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -23,4 +25,8 @@ public class OrderDetail {
 	
 	private Integer subTotal;//NN
 	private String employeeId;
+	
+	@ManyToOne
+	@JoinColumn(name="productid")
+	private Product product;
 }
