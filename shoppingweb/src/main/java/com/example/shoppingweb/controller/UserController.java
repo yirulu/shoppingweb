@@ -71,6 +71,7 @@ public class UserController {
 	    		session.setAttribute("loginuser", u);
 	    		mysession=session;
 	    		loginuser=u.getEmployeeID()+","+u.getDepartment();
+	    		UserService.userID=u.getEmployeeID();
 	    		
 	    		System.out.println(loginuser+'-'+"session~~"+mysession);
 	    		return ResponseEntity.ok(u);
