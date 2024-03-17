@@ -107,14 +107,31 @@ public class SalesOrderController {
 	
 	//change order status to specific by be selected
 	@PostMapping("/updateStatus/{status}")
-	public List<SalesOrder> updateSales(@RequestBody List<SalesOrder>sales,@PathVariable("status") String status ){
-		//ModelAndView model=new ModelAndView("salesIndex");
-		List<SalesOrder>update= sales.stream().map(s->
-				{s.setStatusCode(status);
-				return s;}).toList();
-		update.stream().forEach(u->dao.save(u));
-		return getAll();
+    public List<SalesOrder> updateSalesStatus(@RequestBody List<String> sorderIds, @PathVariable("status") String status) {
+        for (String sorderId : sorderIds) {
+            SalesOrder salesOrder = dao.findById(sorderId).orElse(null);
+            if (salesOrder != null) {
+                salesOrder.setStatusCode(status);
+                dao.save(salesOrder);
+            }
+        }
+        return dao.findAll(); 
+    }
+	@PostMapping("/updateAddress/{sorderId}")
+	public void updateAddress(@PathVariable("sorderId") String sorderId, @RequestParam("address") String address) {
+	    SalesOrder salesOrder = dao.findById(sorderId).orElse(null);
+	    if (salesOrder != null) {
+	        salesOrder.setReceiveAddress(address);
+	        dao.save(salesOrder);
+	    }
 	}
+	@PostMapping("/updateDetail/{id}")
+	public void updateAllDetailByid(@PathVariable("sorderId") String sorderid,@RequestBody List<OrderDetail> details) {
+		SalesOrder order =  dao.findById(sorderid).get();
+		order.setOrderDetails(details);
+		 dao.save(order);
+	}
+
 	
 	//create cart
 //	@GetMapping("/addCart/{pid}")
