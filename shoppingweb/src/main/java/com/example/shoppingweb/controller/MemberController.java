@@ -6,9 +6,11 @@ import org.springframework.web.bind.annotation.*;
 
 import com.example.shoppingweb.model.*;
 
+import jakarta.persistence.*;
 import jakarta.servlet.http.HttpSession;
+import jakarta.transaction.Transactional;
 
-import java.util.ArrayList;
+//import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,7 +18,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/member")
 public class MemberController {
-	private List<Member> memberList = new ArrayList<>();
+	// private List<Member> memberList = new ArrayList<>();
 	@Autowired
 	MemberDAO dao;
 
@@ -44,31 +46,28 @@ public class MemberController {
 	}
 
 	@PostMapping("/changePassword")
-	public ResponseEntity<?> changeMemberPassword(@RequestBody ChangePasswordRequest request) {
-		// Find the member by ID
-		String memberEmail = request.getEmail();
-		Member member = dao.findByEmail(memberEmail);
-
-		// Check if member exists
-		if (member == null) {
-			return ResponseEntity.badRequest().body(new ErrorResponse(false, "找不到該用戶", "Not_Found_User"));
+	@Transactional
+	public ResponseEntity<?> changeMemberPassword(@RequestParam("email") String email, @RequestParam("nid") String nid,
+			@RequestParam("password") String newPassword) {
+		Member m = dao.findByEmail(email);
+		if (m == null) {
+			return ResponseEntity.ok(new ErrorResponse(false, "無此email帳號", "no_email"));
 		}
-		
-		// Check 身分證號錯誤
-		if (!member.getName().equals(request.getNid())) {
-			return ResponseEntity.badRequest().body(new ErrorResponse(false, "身分證後五碼錯誤", "Failed_NID"));
+		// 驗證nid
+		if (!m.getNid().equals(nid)) {
+			return ResponseEntity.ok(new ErrorResponse(false, "Social Security Number不正確", "wrong_nid"));
+		}
+		// 更新密碼
+//		System.out.println("newPassword:  " + newPassword + " |  原來pwd: " + m.getEmail());
+		int updatedRows = dao.changePassword(m.getEmail(), newPassword);
+//		System.out.println(" int update-Row: " + updatedRows);
+
+		if (updatedRows > 0) {
+			return ResponseEntity.ok(new SuccessResponse(true, "密碼變更成功"));
+		} else {
+			return ResponseEntity.ok(new ErrorResponse(false, "密碼更新失敗", "error"));
 		}
 
-		// Check if the old password matches
-		if (!member.getPassword().equals(request.getNewPassword())) {
-			return ResponseEntity.badRequest().body(new ErrorResponse(false, "舊密碼不正確","Error passworsd"));
-		}
-
-		// Update the password to the new password
-		member.setPassword(request.getNewPassword());
-		dao.save(member);
-
-		return ResponseEntity.ok().body(new SuccessResponse(true, "密碼修改成功"));
 	}
 
 	@PutMapping("/email/{email}")
@@ -86,7 +85,30 @@ public class MemberController {
 			ex.setPassword(m.getPassword());
 		}
 		System.out.println("update:" + ex);
+		dao.save(ex);
 		return ex;
+	}
+
+	@PostMapping("/upMember")
+	@Transactional
+	public ResponseEntity<?> updateMemberData(@RequestParam("email") String email, @RequestParam("nid") String nid,
+			@RequestParam("password") String newPassword) {
+		Member m = dao.findByEmail(email);
+		if (m == null) {
+			return ResponseEntity.ok(new ErrorResponse(false, "無此email帳號", "no_email"));
+		}
+
+		// 更新密碼
+		System.out.println("newPassword:  " + newPassword + " |  原來pwd: " + m.getEmail());
+		int updatedRows = dao.changePassword(m.getEmail(), newPassword);
+		System.out.println(" int update-Row: " + updatedRows);
+
+		if (updatedRows > 0) {
+			return ResponseEntity.ok(new SuccessResponse(true, "密碼變更成功"));
+		} else {
+			return ResponseEntity.ok(new ErrorResponse(false, "密碼更新失敗", "error"));
+		}
+
 	}
 
 	@DeleteMapping("/{email}")
@@ -97,16 +119,24 @@ public class MemberController {
 	}
 
 	@PostMapping("/login")
-	public ResponseEntity<Member> verifyEmail(@RequestParam("email") String email,
+	public ResponseEntity<Member> memberLogin(@RequestParam("email") String email,
 			@RequestParam("password") String password, HttpSession session) {
+
+		// System.out.print("email:" + email + " password:" + password+"/n");
+
 		Member m = dao.findByEmail(email);
 		if (m == null) // 找不到 email
 			return ResponseEntity.notFound().build(); // 404 NOT Found
 
+		// System.out.print("m.Password:" + m.getPassword() +"/n");
+		// System.out.print("form.Password:" + password + "/n");
+
 		if (m.getPassword().equals(password)) { // 驗證密碼是否正確
 			session.setAttribute("loginuser", m);
+			// System.out.print("驗證密碼正確" + "\n");
 			return ResponseEntity.ok(m);
 		} else {
+			// System.out.print("驗證密碼 Error" + "\n");
 			return ResponseEntity.badRequest().build(); // "status": 400, "error": "Bad Request"
 		}
 		/*
@@ -176,36 +206,4 @@ class SuccessResponse {
 	public void setMessage(String message) {
 		this.message = message;
 	}
-}
-class ChangePasswordRequest {
-    private String Email;
-    private String Nid;
-    private String newPassword;
-	public ChangePasswordRequest() {	}
-	public ChangePasswordRequest(String email, String nid, String Password) {
-		super();
-		Email = email;
-		Nid = nid;
-		this.newPassword = Password;
-	}
-	public String getEmail() {
-		return Email;
-	}
-	public void setEmail(String email) {
-		Email = email;
-	}
-	public String getNid() {
-		return Nid;
-	}
-	public void setNid(String nid) {
-		Nid = nid;
-	}
-	public String getNewPassword() {
-		return newPassword;
-	}
-	public void setNewPassword(String newPassword) {
-		this.newPassword = newPassword;
-	}
-	
-        
 }
