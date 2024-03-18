@@ -1,6 +1,7 @@
 package com.example.shoppingweb.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -47,15 +48,19 @@ public class MemberController {
 
 	@PostMapping("/changePassword")
 	@Transactional
-	public ResponseEntity<?> changeMemberPassword(@RequestParam("email") String email, @RequestParam("nid") String nid,
+	public ResponseEntity<?> changeMemberPassword(@RequestParam("email") String email, 
+			@RequestParam("nid") String nid,
 			@RequestParam("password") String newPassword) {
 		Member m = dao.findByEmail(email);
 		if (m == null) {
-			return ResponseEntity.ok(new ErrorResponse(false, "無此email帳號", "no_email"));
+			System.out.println("找不到Email");
+			ErrorResponse errorResponse = new ErrorResponse(false, "無此email帳號", "no_email");
+	        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
 		}
 		// 驗證nid
 		if (!m.getNid().equals(nid)) {
-			return ResponseEntity.ok(new ErrorResponse(false, "Social Security Number不正確", "wrong_nid"));
+			ErrorResponse errorResponse = new ErrorResponse(false, "Nid 錯誤", "wrong_nid");
+	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
 		}
 		// 更新密碼
 //		System.out.println("newPassword:  " + newPassword + " |  原來pwd: " + m.getEmail());
@@ -63,9 +68,11 @@ public class MemberController {
 //		System.out.println(" int update-Row: " + updatedRows);
 
 		if (updatedRows > 0) {
+			System.out.println("密碼變更成功");
 			return ResponseEntity.ok(new SuccessResponse(true, "密碼變更成功"));
 		} else {
-			return ResponseEntity.ok(new ErrorResponse(false, "密碼更新失敗", "error"));
+			System.out.println("密碼更新失敗");
+			return ResponseEntity.ok(new ErrorResponse(false, "DB dao 密碼更新失敗", "error"));
 		}
 
 	}
@@ -133,10 +140,10 @@ public class MemberController {
 
 		if (m.getPassword().equals(password)) { // 驗證密碼是否正確
 			session.setAttribute("loginuser", m);
-			// System.out.print("驗證密碼正確" + "\n");
+			System.out.print("驗證密碼正確" + "\n");
 			return ResponseEntity.ok(m);
 		} else {
-			// System.out.print("驗證密碼 Error" + "\n");
+			System.out.print("驗證密碼 Error" + "\n");
 			return ResponseEntity.badRequest().build(); // "status": 400, "error": "Bad Request"
 		}
 		/*
