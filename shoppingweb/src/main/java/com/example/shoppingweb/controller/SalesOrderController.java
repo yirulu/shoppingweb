@@ -31,49 +31,42 @@ public class SalesOrderController {
 	@Autowired
 	OrderDetailDAO dDao;	
 	@Autowired
-	ProductDAO pDao;	
-	
-	 
-	
-	@GetMapping("/")
-	public ModelAndView gotoIndex() {
-		ModelAndView model=new ModelAndView("salesIndex");
-		return model;
-	}
+	ProductDAO pDao;		
+
 	
 	//search all order
 	@GetMapping("/querySales")
 	public List<SalesOrder> getAll() {
-		ModelAndView model=new ModelAndView("salesIndex");
+		
 		List<SalesOrder> sales=dao.findAll();
-		model.addObject("sales",sales);
+		
 		return sales;
 	}
 	
 	@GetMapping("/querySalesById/{memberId}")
 	public List<SalesOrder> getBymemberid(@PathVariable("memberId")Integer memberId) {
-		ModelAndView model=new ModelAndView("querySalesById");
+		
 		List<SalesOrder> sales=dao.findBymemberId(memberId);
-		model.addObject("sales",sales);
+		
 		return sales;
 	}
 	
 	//search order by order status 
 	@GetMapping("/querySalesByStatus/{status}")
 	public List<SalesOrder> getByStatus(@PathVariable("status")String status) {
-		ModelAndView model=new ModelAndView("salesIndex");
+		
 		List<SalesOrder> sales=dao.findBystatusCode(status);
-		model.addObject("sales",sales);
+		
 		return sales;
 	}
 	
 	//search order by order date
 	@GetMapping("/querySalesByDate/{date}")
 	public List<SalesOrder> getByDate(@PathVariable("date")String date) {
-		ModelAndView model=new ModelAndView("salesIndex");
+		
 		String d=date.replace("-","")+"%";		
 		List<SalesOrder> sales=dao.findBygenerateDateLike(d);
-		model.addObject("sales",sales);
+		
 		return sales;
 	}
 	
@@ -106,12 +99,19 @@ public class SalesOrderController {
 	}
 	
 	//change order status to specific by be selected
-	@PostMapping("/updateStatus/{status}")
-    public List<SalesOrder> updateSalesStatus(@RequestBody List<String> sorderIds, @PathVariable("status") String status) {
+	@PostMapping("/updateStatus/{status}/{uid}")
+    public List<SalesOrder> updateSalesStatus(@RequestBody List<String> sorderIds, @PathVariable("status") String status,@PathVariable("uid")String uid) {
         for (String sorderId : sorderIds) {
             SalesOrder salesOrder = dao.findById(sorderId).orElse(null);
             if (salesOrder != null) {
+            	salesOrder.setEmployeeId(uid);
                 salesOrder.setStatusCode(status);
+                if(status.equals("完成")) {
+                salesOrder.setComplateDate(SalesOrderService.getCurrentDateTime());	
+                }
+                if(status.equals("作廢")) {
+                salesOrder.setInvalidDate(SalesOrderService.getCurrentDateTime());	
+                }
                 dao.save(salesOrder);
             }
         }

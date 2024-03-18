@@ -23,13 +23,13 @@ public class SalesOrder {
 
 	private String receiveAddress;//NN
 
-	private String statusCode="SOS_P";//NN
+	private String statusCode="準備中";//NN
 
-	private Date shipDate;
+	private String invalidDate;
 
 	private Integer sorderPrice;//NN
 
-	private Date complateDate;
+	private String complateDate;
 
 	private String employeeId;
 	
