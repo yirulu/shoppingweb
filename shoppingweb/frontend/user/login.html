@@ -1,0 +1,60 @@
+<!-- CSS dependencies -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" type="text/css">
+<link rel="stylesheet" href="wireframe.css" type="text/css">
+
+<div class="container">
+  <div class="row">
+    <div class="mx-auto col-md-6 col-10 bg-white p-5">
+      <h1 class="mb-4">Login</h1>
+      <form>
+        <div class="form-group"> <input type="text" class="form-control" placeholder="Enter username" id="userName"> </div>
+        <div class="form-group mb-3"> <input type="password" class="form-control" placeholder="Password" id="password"  > 
+          <small class="form-text text-muted text-right"></small> </div> 
+          <button type="button" class="btn btn-primary" onclick="return userlogin();">Login</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  function userlogin()
+  {  
+    var un = $("#userName").val();
+    var pw=$("#password").val();
+
+       $.ajax({
+        
+              url: 'http://localhost:8080/users/login',
+              method: 'POST',
+              data: {
+                userName: un,
+                password: pw
+              },
+              
+              dataType: 'JSON',
+              success: function (data, textStatus, jqXHR) {
+                
+                  // 登錄成功，處理響應數據
+                  console.log(data);
+                  // 儲存用戶信息到 sessionStorage
+                  sessionStorage.setItem('loginUser', data.name);
+                  sessionStorage.setItem('loginUserDep', data.department);
+                  sessionStorage.setItem('employeeID', data.employeeID);
+                  
+                  identity ='user';
+                  alert("登入成功!");              
+                  getfunctionlist_user();
+                  getproducts();                  
+                  return false;
+              },
+              error: function (jqXHR, textStatus, errorThrown) {
+                  // 登錄失敗，處理錯誤
+                  if (jqXHR.status === 404) {
+                      alert('用戶名或密碼錯誤');
+                  } else {
+                      alert('登錄失敗：' + errorThrown);
+                  }
+              }
+          });
+ }
+</script>

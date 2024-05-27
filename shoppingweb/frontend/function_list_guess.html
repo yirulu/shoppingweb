@@ -1,0 +1,234 @@
+<body>
+  <!-- CSS dependencies -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" type="text/css">
+  <link rel="stylesheet" href="wireframe.css" type="text/css">
+  <!-- <script src="main.js"></script> -->
+  <!-- <script src="./product/main.js"></script>     -->
+   <!-- jQuery library -->
+   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+
+ 
+          <li class="nav-item" id="products"><a class="nav-link" onclick="getproducts()" href="#">所有商品</a></li>
+          <li class="nav-item dropdown"> 
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">書寫筆類</a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink"> 
+                <a class="dropdown-item" href="#" onclick="getproductsbymaintype('PT1000')">所有商品</a>
+                <a class="dropdown-item" href="#" onclick="getproductsbytype('PT1001')">原子筆</a>
+                <a class="dropdown-item" href="#" onclick="getproductsbytype('PT1002')">鋼珠筆</a>
+                <a class="dropdown-item" href="#" onclick="getproductsbytype('PT1003')">鉛筆</a>
+                <a class="dropdown-item" href="#" onclick="getproductsbytype('PT1004')">螢光筆</a>
+                <a class="dropdown-item" href="#" onclick="getproductsbytype('PT1005')">鋼筆</a>
+            </div>
+          </li>
+          <li class="nav-item dropdown"> 
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">紙品類</a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink"> 
+                <a class="dropdown-item" href="#" onclick="getproductsbymaintype('PT2000')">所有商品</a>
+                <a class="dropdown-item" href="#" onclick="getproductsbytype('PT2001')">影印紙</a>
+                <a class="dropdown-item" href="#" onclick="getproductsbytype('PT2002')">筆記本</a>
+                <a class="dropdown-item" href="#" onclick="getproductsbytype('PT2003')">桌曆</a>
+                <a class="dropdown-item" href="#" onclick="getproductsbytype('PT2004')">活頁紙</a>
+                <a class="dropdown-item" href="#" onclick="getproductsbytype('PT2005')">便條紙</a>
+            </div>
+          </li>
+          <li class="nav-item dropdown"> 
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">文具用品</a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                 <a class="dropdown-item" href="#" onclick="getproductsbymaintype('PT3000')">所有商品</a>
+                 <a class="dropdown-item" href="#" onclick="getproductsbytype('PT3001')">橡皮擦</a>
+                 <a class="dropdown-item" href="#" onclick="getproductsbytype('PT3002')">立可帶</a>
+                 <a class="dropdown-item" href="#" onclick="getproductsbytype('PT3003')">膠帶</a>
+                 <a class="dropdown-item" href="#" onclick="getproductsbytype('PT3004')">剪刀</a>
+            </div>
+          </li>
+          <li class="nav-item dropdown"> 
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">辦公用品</a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                 <a class="dropdown-item" href="#" onclick="getproductsbymaintype('PT4000')">所有商品</a>
+                 <a class="dropdown-item" href="#" onclick="getproductsbytype('PT4001')">釘書機</a>
+                 <a class="dropdown-item" href="#" onclick="getproductsbytype('PT4002')">迴紋針</a>
+                 <a class="dropdown-item" href="#" onclick="getproductsbytype('PT4003')">長尾夾</a>
+                </div>
+          </li>
+          <!--member-->
+          <li id="memberlist" class="nav-item dropdown" style="display: none;" > 
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">管理功能選單</a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink"> 
+              <a class="dropdown-item" href="#" onclick="tomemberdata()" >會員基本資料管理</a>
+              <a class="dropdown-item" href="#" onclick="tohistoryorders()" >歷史訂單查詢</a></div>
+          </li>
+           <!--user-->
+           <li id="userlist" class="nav-item dropdown" style="display: none;"> 
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">管理功能選單</a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink"> 
+              <a class="dropdown-item" onclick="touserdata()" href="#">員工基本資料管理</a> <!--emp:only self / manager:all -->
+              <a class="dropdown-item" onclick="toproductdata()" href="#">商品管理</a>
+              <a class="dropdown-item" onclick="toproducttypedata()" href="#">商品類別管理</a>
+              <a class="dropdown-item" onclick="tosalesorderdata()" href="#">訂單管理</a></div>
+          </li>
+
+          <script> 
+
+            function getproductsbytype(subType)
+            {
+              //alert(subType);
+              var products2 = [
+            // 您的商品數據
+            ];
+            function fetchProducts2(){
+              // $.get('https://fakestoreapi.com/products/',result);       
+              $.get('http://localhost:8080/products/byptypeid/'+subType,result2);
+              //alert(subType);
+            };
+            function result2(data){
+                //alert(subType);                
+                products2=data;
+                displayProducts2(currentPage);
+                generatePagination2();                 
+              };
+            
+            const productsPerPage = 9;
+            let currentPage = 1;
+          
+            function displayProducts2(page) {      
+              const startIndex = (page - 1) * productsPerPage;
+              const endIndex = startIndex + productsPerPage;
+          
+              $('#productsContainer2').empty();
+          
+              for (let i = startIndex; i < endIndex && i < products2.length; i++) {
+                const product = products2[i];
+                $('#productsContainer2').append(`
+                <div class="col-md-4 p-3" style="">
+                  <div class="card box-shadow" style="width:90%">
+                    <img class="card-img-top" src="http://localhost:8080/product/${product.productid}.jpg">
+                    <div class="card-body">
+                      <h5 class="card-title">${product.pname}</h5>                
+                      <p class="card-text">$${product.unitprice}</p>
+                      <p class="card-text">${product.ptext}</p>
+                      <div class="d-flex justify-content-between align-items-center">
+                        <div class="btn-group">
+                          <button  type="button" class="btn btn-sm btn-outline-secondary" data-product-id="${product.productid}" 
+                          data-toggle="modal" onclick="addcart('${product.productid}')">
+                          <i class="fa fa-fw fa-cart-plus fa-lg"></i><i class="fa fa-fwfa-cart-plus"></i></button>
+                        </div> <small class="text-muted" contenteditable="true"></small>
+                      </div>
+                    </div>
+                  </div>
+                </div>         
+                `);
+                //alert(product);
+              }
+          
+            }
+
+              function generatePagination2() {
+                $('#productPagination2').empty();
+            
+                const totalPages = Math.ceil(products2.length / productsPerPage);
+            
+                for (let i = 1; i <= totalPages; i++) {
+                  const pageItem = $(`
+                    <li class="page-item ${i === currentPage ? 'active' : ''}">
+                      <a class="page-link" href="#" data-page="${i}">${i}</a>
+                    </li>
+                  `);
+            
+                  pageItem.on('click', (e) => {
+                    e.preventDefault();
+                    currentPage = parseInt($(e.target).data('page'));
+                    displayProducts2(currentPage);
+                    generatePagination2();
+                  });
+            
+                  $('#productPagination2').append(pageItem);
+                }
+              }
+              fetchProducts2();
+              $.get("./product/products2.html",setmainspace2);
+            }
+
+           function getproductsbymaintype(mainType)
+            {
+              var products3 = [
+            // 您的商品數據
+            ];
+            fetchProducts3 = () => {
+              // $.get('https://fakestoreapi.com/products/',result);       
+              $.get('http://localhost:8080/products/bypmaintypeid/'+mainType,result3);       
+            };
+            result3=(data)=>{
+              products3=data;
+                displayProducts3(currentPage);
+                generatePagination3();
+              };
+            
+            const productsPerPage = 9;
+            let currentPage = 1;
+          
+            function displayProducts3(page) {      
+              const startIndex = (page - 1) * productsPerPage;
+              const endIndex = startIndex + productsPerPage;
+          
+              $('#productsContainer2').empty();
+          
+              for (let i = startIndex; i < endIndex && i < products3.length; i++) {
+                const product = products3[i];
+                $('#productsContainer2').append(`
+                <div class="col-md-4 p-3" style="">
+                  <div class="card box-shadow" style="width:90%">
+                    <img class="card-img-top" src="http://localhost:8080/product/${product.productid}.jpg">
+                    <div class="card-body">
+                      <h5 class="card-title">${product.pname}</h5>                
+                      <p class="card-text">$${product.unitprice}</p>
+                      <p class="card-text">${product.ptext}</p>
+                      <div class="d-flex justify-content-between align-items-center">
+                        <div class="btn-group">
+                          <button  type="button" class="btn btn-sm btn-outline-secondary" data-product-id="${product.productid}" 
+                          data-toggle="modal" onclick="addcart('${product.productid}')">
+                          <i class="fa fa-fw fa-cart-plus fa-lg"></i><i class="fa fa-fwfa-cart-plus"></i></button>
+                        </div> <small class="text-muted" contenteditable="true"></small>
+                      </div>
+                    </div>
+                  </div>
+                </div>         
+                `);      
+              }
+          
+            }
+
+              function generatePagination3() {
+                $('#productPagination2').empty();
+            
+                const totalPages = Math.ceil(products3.length / productsPerPage);
+            
+                for (let i = 1; i <= totalPages; i++) {
+                  const pageItem = $(`
+                    <li class="page-item ${i === currentPage ? 'active' : ''}">
+                      <a class="page-link" href="#" data-page="${i}">${i}</a>
+                    </li>
+                  `);                
+            
+                  pageItem.on('click', (e) => {
+                    e.preventDefault();
+                    currentPage = parseInt($(e.target).data('page'));
+                    displayProducts3(currentPage);
+                    generatePagination3();
+                  });
+            
+                  $('#productPagination2').append(pageItem);
+                }
+              }
+              fetchProducts3();
+              $.get("./product/products2.html",setmainspace2);            
+            }
+
+            function setmainspace2(data)
+            {
+              //alert("run");
+              $("#mainspace").empty();
+              $("#mainspace").append(data);              
+            }
+          </script>
+</body>
+      

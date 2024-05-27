@@ -1,0 +1,112 @@
+<div class="container">
+    <div class="row">
+      <div class="mx-auto col-lg-6">
+        <h2 class="justify-content-between my-3">員工基本資料修改</h2>
+        <form class="text-left" style="">
+          <div class="form-group"> <label for="form16">Employee ID</label> <input type="text" class="form-control" id="employeeID" readonly="readonly"> </div>
+          <div class="form-group"> <label for="form17">Employee Name</label> <input type="text" class="form-control" id="name"> </div>
+          <div class="form-group"> <label for="form18">Employee Email</label> <input type="email" class="form-control" id="email"> </div>
+          <div class="form-group"> <label for="form18">Employee UserName</label> <input type="text" class="form-control" id="userName"> </div>
+          <div class="form-row">
+            <div class="form-group col-md-6" id="m_password1"> <label for="form19">Password</label> <input type="password" class="form-control" id="password1"> </div>
+            <div class="form-group col-md-6"> <label for="form20">Confirm Password</label> <input type="password" class="form-control" id="password2"> </div>
+          </div>
+          <div class="form-group"> <label for="form18">Employee Department&nbsp;&nbsp;&nbsp;</label> 
+            <input name="department" id="depE" type="radio" class="btn btn-primary px-3" value="E">Employee&nbsp;
+            <input name="department" id="depM"  type="radio" class="btn btn-primary px-3" value="M">manager
+          </div>
+          <div class="form-row">
+            <div class="form-group col-md-6"> <label for="form18">Enabled&nbsp;&nbsp;&nbsp;</label> 
+              <input name="enabled" id="enabledTrue" type="radio" class="btn btn-primary px-3" value="1">True&nbsp;
+              <input name="enabled" id="enabledFalse" type="radio" class="btn btn-primary px-3" value="0">False
+          </div></div>
+          <button type="submit" class="btn btn-primary px-3" id="updatUser">Submit </button>
+          <button type="submit" class="btn btn-primary px-3 ml-3" id="Cancel">Cancel</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  <script>
+    function Cancel() {
+      $.get("./user/manager/userquery_mgr.html", setmainspace);
+      getfunctionlist_user();
+    } 
+    function updatUser(evt) {
+        evt.preventDefault();
+
+        var obj = {};
+        obj.employeeID = $("#employeeID").val();
+        obj.name = $("#name").val();
+        obj.email = $("#email").val();
+        obj.userName = $("#userName").val();
+        obj.password = $("#password1").val();
+        obj.department = $("input[name='department']:checked").val(); 
+        obj.enabled = $("input[name='enabled']:checked").val() === "1"; 
+
+
+
+        if(obj.password != $("#password2").val()){
+          alert("The passwords are inconsistent, please re-enter");
+        } else if (obj.name.trim().length === 0){ 
+          alert("Please enter name");
+        } else if (obj.email.trim().length === 0){ 
+          alert("Please enter email");
+        } else if (obj.userName.trim().length === 0){ 
+          alert("Please enter userName");
+        } else if (obj.password.trim().length === 0){ 
+          alert("Please enter password");
+        } else {
+         $.ajax({
+            method: 'post',
+            url: "http://localhost:8080/users/"+ obj.employeeID,           
+            contentType: 'application/json',                 
+            data: JSON.stringify(obj),
+            dataType: "html",	//設定回傳的資料格式
+            success: function(response) {
+          		alert("New user has been updateed successfully.");
+              $.get("./user/manager/userquery_mgr.html", setmainspace);
+      	  	},
+          	error: function(xhr, status, error) {
+      		    alert("An error occurred while updateing the user: " + error);
+          	}
+          });
+        }
+    }    
+
+ $(document).ready(function() {
+    var employeeID = sessionStorage.getItem("employeeID");
+    
+    $.ajax({
+      method: 'GET',
+      url: "http://localhost:8080/users/employeeID/" + employeeID,
+      dataType: 'json',
+      success: function(data) {
+        // Populate form fields with retrieved data
+        $("#employeeID").val(data.employeeID);
+        $("#name").val(data.name);
+        $("#email").val(data.email);
+        $("#userName").val(data.userName);
+        $("#password1").val(data.password);
+        $("#password2").val(data.password);
+        if (data.department==="M"){
+          $("#depM").prop("checked", true);           
+        } else{
+          $("#depE").prop("checked", true);           
+        }
+        
+        if (data.enabled) {
+          $("#enabledTrue").prop("checked", true);           
+        } else {
+          $("#enabledFalse").prop("checked", true);
+        }
+
+        },
+      error: function(xhr, status, error) {
+        alert("An error occurred while fetching employee data: " + error);
+      }
+    });
+
+    $("#updatUser").click(updatUser);
+    $("#Cancel").click(Cancel);
+  });
+  </script>

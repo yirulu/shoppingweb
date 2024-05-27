@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang = "zh" xmlns:th = "http://www.thymeleaf.org">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- PAGE settings -->
+  <link rel="icon" href="https://templates.pingendo.com/assets/Pingendo_favicon.ico">
+  
+  <title>Alice Stationerylt;/span&gt;&lt;/div&gt;</title>
+  <meta name="description" content="Wireframe design of an album page by Pingendo">
+  <meta name="keywords" content="Pingendo bootstrap example template wireframe album ">
+  <meta name="author" content="Pingendo">
+  <!-- CSS dependencies -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" type="text/css">
+  <link rel="stylesheet" href="wireframe.css">  
+  <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"> -->
+
+  <!-- jQuery library -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+  <!-- Popper JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <!-- Latest compiled JavaScript -->
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+  <!--Angular.js Library-->
+  <script src="https://cdn.staticfile.org/angular.js/1.8.1/angular.min.js"></script>
+  
+  <script src="./product/main.js"></script>
+  <!-- <script src="./product/productbymaintype.js"></script> 
+  <script src="./product/productbysubtype.js"></script>  -->
+  <script src="changepage.js"></script>  
+</head>
+
+<body>  
+  <nav class="navbar navbar-expand-md bg-dark navbar-dark mx-auto mr-4" style="">
+    <div class="container"> 
+      <a class="navbar-brand" href="#" onclick="getIndex()">
+        <i class="fa d-inline fa-lg fa-stop-circle"></i>
+        <b>Alice Stationery&nbsp;</b>
+      </a> <button class="navbar-toggler navbar-toggler-right border-0" type="button" data-toggle="collapse" data-target="#navbar10">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div id="navbtn" class="collapse navbar-collapse" id="navbar10">
+        <ul id="functionlist" class="navbar-nav ml-auto" style="">
+         <!--插入function_list_guess -->
+        </ul>
+        <!--登入後替換按鈕-起-->
+        <!--guest-->
+        <a id="memberlogin"class="btn btn-default navbar-btn" style="" onclick="memberlogin()">會員登入</a>
+        <a id="userlogin"class="btn btn-default navbar-btn" style="" onclick="userlogin()">後台登入</a>
+        <!--member-->
+        <a id="memberlogout" class="btn btn-default navbar-btn" style="display: none;" onclick="memberlogout()">會員登出</a>  
+        <!--user-->
+        <a id="userlogout" class="btn btn-default navbar-btn" style="display: none;" onclick="userlogout()">後台登出</a>
+        <div class="col-md-1" style="">
+        <a id="cartbtn" class="btn btn-outline-primary"  onclick="tocartpage()" style="">
+        <i id="cartbtni"class="fa fa-shopping-cart fa-fw fa-lg"><br></i></a>   
+        <!--登入後替換按鈕-終-->
+        </div>
+      </div>
+    </div>
+  </nav> 
+  <div class="py-5 text-center text-md-right h-60" style="background-image: url(&quot;https://static.pingendo.com/cover-bubble-dark.svg&quot;); background-position: right bottom; background-size: cover; background-repeat: repeat; background-attachment: fixed;">
+    <div class="container">
+      <div class="row">
+        <div class="p-5 mx-md-0 ml-md-auto col-md-9 mx-auto h-100">
+          <h3 class="display-3">Let's Start Shopping</h3>
+          <p class="mb-3 lead">The best quality stationery products</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="mainspace" class="py-4 bg-light">
+    <!--替換主要區域-->
+  </div>
+  <div id="mainspace2" class="py-4 bg-light">
+    <!--替換主要區域-->
+  </div>
+
+   <!-- The Modal -->
+<div class="modal" id="cartModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h4 class="modal-title">購物車訊息</h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+
+      <!-- Modal body -->
+      <div class="modal-body">
+        已加入購物車!
+      </div>
+
+      <!-- Modal footer -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="tocartpage()">開啟購物車</button>
+        <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="closemodal()">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <footer class="text-muted py-5">
+    <div class="container">
+      <p class="float-right">
+        <a href="#">Back to top</a>
+      </p>
+      <p>Album template is based on Bootstrap © examples.&nbsp; <br>New to Bootstrap? <a href="#">Visit the homepage</a> or read our <a href="#">getting started guide</a>.</p>
+    </div>
+  </footer>  
+  <pingendo onclick="window.open('https://pingendo.com/', '_blank')" style="cursor:pointer;position: fixed;bottom: 20px;right:20px;padding:4px;background-color: #00b0eb;border-radius: 8px; width:220px;display:flex;flex-direction:row;align-items:center;justify-content:center;font-size:14px;color:white">Made with Pingendo Free&nbsp;&nbsp;<img src="https://pingendo.com/site-assets/Pingendo_logo_big.png" class="d-block" alt="Pingendo logo" height="16"></pingendo>
+  
+ 
+  <script>
+    function closemodal()
+    {
+      $("#cartModal").hide();
+    }
+    let itemList = [];
+    function cleartemp(){
+      itemList.length=0;
+    }
+    function deleteOneTemp(i){
+      // alert(typeof(i));
+      itemList=itemList.filter(d=>d.productId!==i);      
+      // console.log(itemList);
+    }  
+    
+    
+    function addcart(pid){
+      if(identity !== 'member'){
+      alert("請先登入再挑選商品");
+      memberlogin();
+    }else
+    {
+        var item = {"productId":pid,"productQty":1};
+        var checkItem=itemList.find((t)=>t.productId==pid);    
+        if(checkItem===undefined){
+        itemList.push(item);    
+      }else if(checkItem.productId===item.productId){
+        checkItem.productQty+=1;
+        index=itemList.indexOf(item);
+        itemList.splice(index,1);
+        itemList.push(checkItem);   
+  }    
+  sessionStorage.setItem("tempcart",JSON.stringify(itemList)); 
+  var sessiondata=sessionStorage.getItem("tempcart");
+  // console.log(JSON.parse(sessiondata));
+  $.ajax({
+    method:'POST',
+    url:"http://localhost:8080/orderDetail/createCart",
+    data:sessiondata,
+    contentType:'application/json;charset=utf-8',
+    dataType:'json',
+    success:(data)=>{
+      sessionStorage.setItem("cartList",JSON.stringify(data));
+      var cartdata=sessionStorage.getItem("cartList");
+      // console.log(JSON.parse(cartdata));
+      $("#cartModal").show();  
+    }    
+  });    
+  }  
+}
+  </script>
+ 
+</body>
+</html>

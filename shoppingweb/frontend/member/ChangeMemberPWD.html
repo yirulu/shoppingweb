@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" ng-app="myApp" ng-controller="myCtrl">
+
+<head>
+    <title>會員密碼變更</title>
+    <!-- CSS dependencies -->
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" type="text/css">
+    <link rel="stylesheet" href="wireframe.css" type="text/css">
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <!-- <style>
+        .container {
+            margin: 20px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+    </style> -->
+</head>
+
+<body>   
+    <div class="container">
+        <H2>會員密碼變更</H2>
+        <div class="row">
+            <!-- <div class="mx-auto col-md-6 bg-white p-5"></div> -->
+            <form name="form" ng-submit="submitForm()" novalidate>
+                <label>Email:</label>
+                <input type="email" ng-model="email" required>
+                <span ng-show="form.$submitted || form.email.$touched">
+                    <span ng-show="form.email.$error.email">Email格式錯誤</span>
+                </span><br>
+
+                <label>身分證後五碼:</label>
+                <input type="text" ng-model="nid" required>
+                <span ng-show="form.$submitted || form.nid.$touched">
+                    <span ng-show="form.nid.$error.required">"身分證後五碼"為必填項目</span>
+                </span><br>
+
+                <label>新密碼第一次輸入:</label>
+                <input type="password" ng-model="password" ng-pattern="passwordPattern" required>
+                <span ng-show="form.$submitted || form.password.$touched">
+                    <span ng-show="form.password.$error.pattern">(必填)密碼需包含大小寫字母與數字,至少8碼</span>
+                </span><br>
+
+                <label>新密碼第二次輸入:</label>
+                <input type="password" ng-model="confirmPassword" ng-pattern="passwordPattern" required>
+                <span ng-show="form.$submitted || form.confirmPassword.$touched">
+                    <span ng-show="form.nid.$error.required">Social Security Number為必填項目</span>
+                </span><br>
+
+                <button type="submit" ng-disabled="form.$invalid">變更密碼提交</button>
+            </form>
+        </div>
+    </div>
+    </div>
+
+    <script>
+        var app = angular.module('myApp', []);
+        app.controller('myCtrl', function ($scope) {
+            $scope.passwordMatch = false;
+            $scope.passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+
+            $scope.submitForm = function () {
+                if ($scope.form.$valid && $scope.password === $scope.confirmPassword) {
+                    // 密碼匹配且表單驗證通過
+                    $scope.passwordMatch = true;
+                    // 使用Ajax提交表單
+                    $.ajax({
+                        url: 'http://localhost:8080/member/changePassword',
+                        method: 'POST',
+                        //contentType: 'JSON',
+                        //data: {
+                        //    email: $scope.email,
+                        //    nid: $scope.nid, 
+                        //    password: $scope.password
+                        //},
+
+                        /*
+                        contentType: 'application/json',
+                        data: JSON.stringify({
+                            email: $scope.email,
+                            nid: $scope.nid,
+                            password: $scope.password
+                        }), */
+                        //500 
+                        contentType: 'application/x-www-form-urlencoded',
+                        data: {
+                            email: $scope.email,
+                            nid: $scope.nid,
+                            password: $scope.password
+                        },
+
+                        success: function (data, textStatus, jqXHR) {
+                            // 處理成功響應
+                            console.log(data);
+                            // 根據回應顯示訊息
+                            if (data.result === 'success') {
+                                alert('密碼變更成功');
+                                window.location.href = 'http://localhost:8080/login.html';
+                            } else if (data.result === 'no_email') {
+                                alert('無此email帳號');
+                            } else if (data.result === 'wrong_nid') {
+                                alert('Social Security Number不正確');
+                            }
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            // 處理錯誤
+                            alert('發生錯誤：' + errorThrown);
+                        }
+                    });
+                } else {
+                    // 密碼不匹配或表單驗證未通過
+                    $scope.passwordMatch = false;
+                }
+            };
+        });
+    </script>
+</body>
+
+</html>

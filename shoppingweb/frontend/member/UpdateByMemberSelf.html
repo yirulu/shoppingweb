@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="zh-tw" ng-app="memberApp">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<head>
+    <!-- CSS dependencies -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" type="text/css">
+    <link rel="stylesheet" href="wireframe.css" type="text/css">
+    <meta charset="UTF-8">
+    <title>會員信息修改表單</title>
+    <!-- <style>
+        .error {
+            color: red;
+        }
+
+        .valid {
+            color: blue;
+        }
+
+        /* 當所有輸入正確時,使提交按鈕可用 */
+        #submitButton:disabled {
+            background-color: lightgrey;
+            cursor: not-allowed;
+        }
+
+         .container {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        label {
+            width: 120px;
+            /* 設置 label 寬度 */
+            display: inline-block;
+        }
+
+        input {
+            width: calc(100% - 130px);
+            /* 設置 input 和 button 寬度 */
+            margin-bottom: 10px;
+            /* 添加一些間距 */
+        }
+
+        small {
+            display: red;
+            /* 將 small 放在下一行 */
+            margin-top: 5px;
+            /* 添加上方間距 */
+        }
+    </style> -->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+</head>
+
+<body ng-controller="MemberController">
+    <div class="tmpMessage"> <!-- 隱藏式 訊息 -->
+        <div id="successAlert" class="alert alert-success"
+            style="display: none; color: blue; font-size: 40px; font-weight: bold;">
+            <strong>成功：</strong> 修改成功！
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+                onclick="window.location.href='1.html';">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+
+        <div id="errorAlert" class="alert alert-danger"
+            style="display: none; color: red; font-size: 40px; font-weight: bold;">
+            <strong>錯誤：</strong> 修改失敗，請稍後再試。
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+                onclick="window.location.href='error.html';">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="mx-auto col-md-12 bg-white p-5">
+            <h1>會員資料修改</h1>
+            <form name="memberForm" ng-submit="submitForm(memberForm.$valid)" novalidate>
+                <label>Email :</label>
+                <input type="email" ng-model="member.email" name="email" required />
+                <small ng-show="memberForm.email.$error.email" class="error">登入所用帳號,必填,正確email格式</small>
+                <br />
+
+                <label>Name :</label>
+                <input type="text" ng-model="member.name" name="name" required />
+                <br />
+
+                <label>Address :</label>
+                <input type="text" ng-model="member.address" name="address" required />
+                <br />
+
+                <label>Mobile :</label>
+                <input type="text" ng-model="member.mobile" name="mobile" required ng-pattern="/^09\d{8}$/" /><br />
+                <small ng-show="memberForm.mobile.$error.pattern" class="error">必填,手機號碼必須是09開頭,後面為8個數字</small>
+                <br />
+
+                <label>Birthday :</label>
+                <input type="text" ng-model="member.birthday" name="birthday"
+                    ng-pattern="/^(19|20)\d{2}[01]\d[0-3]\d$/" /><br />
+                <small ng-show="memberForm.birthday.$error.pattern" class="error">必填(8碼),西元年月日YYYYMMDD，如19770520</small>
+                <br />
+
+                <label>身分證後五碼:</label>
+                <input type="text" ng-model="member.nid" name="nid" required ng-pattern="/^\d{5}$/" /><br />
+                <small ng-show="memberForm.nid.$error.pattern" class="error">必填,5個數字,用來找回密碼使用</small>
+                <br />
+
+                <label>Password:</label>
+                <div>
+                    <input type="{{ showPassword ? 'text' : 'password' }}" ng-model="member.password" name="password"
+                        required ng-pattern="/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/" />
+                    <button type="button" ng-click="togglePasswordVisibility()">
+                        <i class="fas" ng-class="{'fa-eye-slash': showPassword, 'fa-eye': !showPassword}"></i>
+                        <span>{{ showPassword ? 'OFF' : 'ON' }}</span>
+                    </button>
+                </div><br />
+                <small ng-show="memberForm.password.$error.pattern" class="error">必填,密碼必須至少8位,包含大小寫字母和數字</small>
+                <br />
+
+                <button type="submit" id="submitButton" ng-disabled="memberForm.$invalid">提交</button>
+            </form>
+        </div>
+    </div>
+
+
+    <div id="successAlert" class="alert alert-danger" style="display: none;">
+        <strong>錯誤：</strong> 修改成功。
+    </div>
+    <div id="errorAlert" class="alert alert-danger" style="display: none;">
+        <strong>錯誤：</strong> 修改失敗，請稍後再試。
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        var app = angular.module('memberApp', []);
+        app.controller('MemberController', function ($scope) {
+            $scope.member = {};
+            $scope.showPassword = false;
+            $scope.togglePasswordVisibility = function () {
+                $scope.showPassword = !$scope.showPassword;
+            };
+
+            $scope.submitForm = function (isValid) {
+                if (isValid) {
+                    // 提交表單邏輯
+                    console.log('修改會員資料:', $scope.member);
+                    // 將表單數據組裝成JSON對象
+                    var data = {
+                        email: $scope.member.email,
+                        name: $scope.member.name,
+                        password: $scope.member.password,
+                        address: $scope.member.address,
+                        mobile: $scope.member.mobile,
+                        birthday: $scope.member.birthday,
+                        nid: $scope.member.nid,
+                        active: true
+                    };
+
+                    $.ajax({
+                        url: 'http://localhost:8080/member',
+                        method: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify(data), // 將 JSON 對象轉換為字串
+                        dataType: 'json',
+                        success: function (data, textStatus, jqXHR) {
+                            if (data.success) {
+                                $('#successAlert').text(data.message);
+                                $('#successAlert').fadeIn().delay(3000).fadeOut();
+                                setTimeout(function () {
+                                    window.location.href = 'member.html';
+                                }, 3000);
+                            } else {
+                                $('#errorAlert').text(data.message); // 後台返回的ERROR信息
+                                if (data.errorType === 'duplicate_email') {
+                                    $('#errorAlert').text("此 EMAIL帳戶已經被使用了,請用其他帳號註冊");
+                                }
+                                $('#errorAlert').fadeIn().delay(5000).fadeOut();
+                                setTimeout(function () {
+                                    window.location.href = 'RegisterMember.html';
+                                }, 3000);
+                            }
+                            $scope.$apply();
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            // 處理錯誤
+                            console.log('發生錯誤：', errorThrown);
+                            $('#errorAlert').fadeIn().delay(8000).fadeOut(); // 顯示失敗通知，並在 3 秒後淡出
+                            setTimeout(function () {
+                                window.location.href = 'RegMember0315.html'; // 跳轉至 error.html
+                            }, 5000); // 等待 5 秒後執行跳轉
+                            $scope.$apply();
+                        }
+                    });
+                }
+            };
+
+
+
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,169 @@
+<!-- CSS dependencies -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" type="text/css">
+<link rel="stylesheet" href="wireframe.css" type="text/css">
+
+<div class="container">
+    <div class="row">
+        <div class="mx-auto col-md-6 bg-white p-5">
+    <h1 class="mb-4">Login</h1>
+    <form th:action="@{/member/login}" method="post">
+		<div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" class="form-control" id="email" placeholder="Enter email" name="email"
+                   pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}">
+            <small class="form-text text-muted">Please enter a Valid email address.(xx@yy.zz)</small>
+            <div th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="text-danger"></div>
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label>
+
+            <div class="input-group">
+                <input type="password" class="form-control" id="password" placeholder="Enter password" name="password"
+                       th:attr="pattern='(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}'"
+                       oninput="checkPassword(this);">                
+                <div class="input-group-append">
+                    <button type="button" id="toggleButton" onclick="togglePasswordVisibility()"
+                        style="cursor: pointer;">
+                        <i id="eyeIcon" class="fa fa-eye" ></i> 
+                        <span id="buttonText">ON</span>
+                    </button>
+                </div>
+            </div>
+            <small class="form-text text-muted">密碼至少八碼含括大小寫與數字.</small>
+        </div>
+        <div class="form-group">
+            <label class="" for="captcha">驗證碼 Captcha</label>
+            <div class="input-group">
+                <input type="text" class="form-control" id="captcha" placeholder="Enter captcha" name="captcha">
+                <div class="input-group-append">
+                    <span class="input-group-text" id="captchaLabel"></span>
+                </div>
+            </div>
+        </div>
+        <button type="button" class="btn btn-primary" onclick="memberlogin();">Login</button><p></p>
+        <button type="button" class="btn btn-link" onclick="toresignmember()">註冊會員</button> 
+        <button type="button" class="btn btn-link" onclick="toforgetpassword()">忘記密碼</button>         
+    </form>
+</div>
+</div>
+</div>
+
+<script>
+    function toforgetpassword()
+    {
+        $.get("./member/ChangeMemberPWD.html",setmainspace);        
+    }
+
+    function toresignmember()
+    {
+        $.get("./member/RegisterMember.html",setmainspace);
+    }
+
+    function memberlogin()
+    {  
+        if( document.getElementById('captcha').style.color == 'black'){
+        $.ajax({
+                url: 'http://localhost:8080/member/login',
+                method: 'POST',
+                data: {
+                    email: $('#email').val(),
+                    password: $('#password').val()
+                },
+                
+                dataType: 'json',
+                contentType : 'application/x-www-form-urlencoded',
+                success: function (data, textStatus, jqXHR) {
+                    // 登錄成功，處理響應數據
+                    console.log(data.memberid);
+                    // 儲存用戶信息到 sessionStorage
+                    sessionStorage.setItem('memberId', data.memberid);
+                    identity = 'member';
+                    alert("登入成功!");
+                    getfunctionlist_member();
+                    getproducts();
+                    //重新導回首頁會還原成未登入狀態
+                    //location.href = "http://127.0.0.1:5500/shoppingweb/index.html";                                        
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    // 登錄失敗，處理錯誤
+                    if ((jqXHR.status === 404) || (jqXHR.status === 400)) {
+                        alert('用戶名或密碼錯誤');
+                    } else {
+                        alert('登錄失敗：' + errorThrown);
+                    }
+                }
+                
+            });
+        }else{
+            alert('驗證碼錯誤');
+            generateCaptcha();
+        }   
+
+        
+    }
+
+	var captcha = '';
+	function generateCaptcha() {
+        captcha = '';
+    	var characters = '23456789abcdABCD';
+    	var charactersLength = characters.length;        
+    	for (var i = 0; i < 4; i++) 
+        	captcha += characters.charAt(Math.floor(Math.random() * charactersLength));
+    	document.getElementById('captchaLabel').innerText = captcha;
+	}
+    function checkCaptcha() {
+        var inputCaptcha = document.getElementById('captcha').value;
+        var labelCaptcha = document.getElementById('captchaLabel').innerText;
+        if (inputCaptcha !== labelCaptcha) {
+            document.getElementById('captcha').style.color = 'red';
+        } else {
+            document.getElementById('captcha').style.color = 'black';
+        }
+    }
+
+    function checkPassword(input) {
+        var password = input.value;
+        var passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
+        if (passwordRegex.test(password)) {
+            input.style.color = 'black';
+        } else {
+            input.style.color = 'red';
+        }
+/*
+至少包含一個數字（(?=.*\d)）
+至少包含一個小寫字母（(?=.*[a-z])）
+至少包含一個大寫字母（(?=.*[A-Z])）
+至少包含8個或更多的字符（.{8,}）
+*/
+    }
+
+     function togglePasswordVisibility() {
+        var passwordInput = document.getElementById("password");
+        var eyeIcon = document.getElementById("eyeIcon");
+        var buttonText = document.getElementById("buttonText");
+
+        if (passwordInput.type === "password") {
+            passwordInput.type = "text";
+            eyeIcon.classList.remove("fa-eye");
+            eyeIcon.classList.add("fa-eye-slash");
+            buttonText.innerText = "OFF";
+        } else {
+            passwordInput.type = "password";
+            eyeIcon.classList.remove("fa-eye-slash");
+            eyeIcon.classList.add("fa-eye");
+            buttonText.innerText = "ON";
+        }
+    }
+
+       //Generate captcha, check it and email format when the page loads
+    $(document).ready(function(){
+        generateCaptcha();
+        document.getElementById('captcha').addEventListener('input', checkCaptcha);
+    });
+    
+    // window.onload = function() {
+    //     generateCaptcha();
+    //     document.getElementById('captcha').addEventListener('input', checkCaptcha);
+    // };
+</script>
+

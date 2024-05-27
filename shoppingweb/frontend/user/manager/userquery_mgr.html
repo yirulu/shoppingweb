@@ -1,0 +1,180 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>User Management</title>
+<!-- CSS dependencies -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" type="text/css">
+<link rel="stylesheet" href="wireframe.css" type="text/css">
+</head>
+<body>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      <div class="btn-group"> </div>
+    </div>
+  </div>
+</div>
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      <div class="row">
+        <div class="col-md-12">
+          <h3 class="my-3">員工基本資料管理</h3>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12 my-3"><a href="#" class="btn btn-primary" id="addemp">新增員工 </a></div>
+ </div>
+</div>
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      <div class="table-responsive">
+        <table class="table table-striped table-borderless" id="message">
+          <thead class="text-center">
+            <tr>
+              <th scope="col" style="" class="w-20">Employee ID</th>
+              <th scope="col" class="" contenteditable="true">Name</th>
+              <th scope="col">Email</th>
+              <th scope="col">User Name</th>
+              <th scope="col" style="">Password</th>
+              <th scope="col">Update / Delete</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row" class="">1</th>
+              <td class="h-10"></td>
+              <td class="w-25"></td>
+              <td></td>
+              <td></td>
+              <td class=""><a class="btn btn-info ml-5 mr-2 update-employee" href="#" id="updateemployee">Update</a><a class="btn btn-info ml-2" href="#" id="deleteemployee">Delete</a></td>             
+            </tr>
+            <tr>
+              <th scope="row" class="">2</th>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td><a class="btn btn-info ml-5 mr-2 update-employee" href="#">Update</a><a class="btn btn-info ml-2" href="#">Delete</a></td>              
+            </tr>
+            <tr>
+              <th scope="row" class="">3</th>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td><a class="btn btn-info ml-5 mr-2 update-employee" href="#">Update</a><a class="btn btn-info ml-2" href="#">Delete</a></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+<div class="container" id="addProductContainer">
+
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+        function showAll(data) {
+            $("#message").empty();
+           // $("#message").attr("border", "1");
+            //建立表格的第一列
+            var div =  $("<div class=>");
+            var firstRow = $("<tr><th>Employee ID</th><th>Name</th><th>Email</th><th>User Name</th><th>Password</th><th>Update / Delete</th></tr>");
+            $("#message").append(firstRow);
+            //將取得的資料一一建立為表格的每一列
+            
+            $.each(data, function (i) {
+                var row = $("<tr></tr>");
+                var td1 = $("<td></td>").text(this.employeeID).appendTo(row);
+                var td2 = $("<td></td>").text(this.name).appendTo(row);
+                var td3 = $("<td></td>").text(this.email).appendTo(row);
+                var td4 = $("<td></td>").text(this.userName).appendTo(row);
+                var td5 = $("<td></td>").text(this.password).appendTo(row);
+                var td6 = $("<td></td>").html(
+                '<a class="btn btn-info ml-5 mr-2 update-employee" href="#" data-employee-id="' + this.employeeID + '">Update</a>'
+                +'<a class="btn btn-info ml-2 delete-employee" href="#" id="deleteEmployee">Delete</a>')
+                .appendTo(row);
+               $("#message").append(row);
+              
+            });
+            $(".delete-employee").click(deleteEmployee);
+            $(".update-employee").click(updateEmployee);
+            
+            
+        }
+        function showMessage(data) {
+            alert(JSON.stringify(data));
+        }
+
+  function touserdata() {
+   $.ajax({
+     method: 'GET',
+     url: "http://localhost:8080/users",
+     dataType: 'json',
+     success: showAll
+   });
+ }    
+// Function to handle adding employee action
+function addEmployee() {
+    $.get("./user/manager/usercreate_mgr.html", setmainspace);
+} 
+function updateEmployee(evt) {
+ 
+  evt.preventDefault();
+   var employeeID = $(this).data("employee-id");
+  
+  $.ajax({
+      method: 'GET',
+      url: "./user/manager/userupdate_mgr.html",
+      dataType: 'html', 
+      success: function(response) {
+        // Populate the space with retrieved data
+        sessionStorage.setItem('employeeID', employeeID);
+        setmainspace(response);
+      },
+      error: function(xhr, status, error) {
+        alert("An error occurred while fetching employee data: " + error);
+      }
+    });
+      
+} 
+// Function to handle deleting employee action
+function deleteEmployee(evt) {
+    evt.preventDefault();
+    var employeeID = $(this).closest("tr").find("td:first").text();
+    var dataUrl = "http://localhost:8080/users/" + employeeID;
+    $.ajax({
+        method: 'DELETE',
+        url: dataUrl,
+        dataType: "html",
+        success: function(response) {
+            alert("Employee with ID: " + employeeID + " has been deleted successfully.");
+             $.get("./user/manager/userquery_mgr.html", setmainspace); // Call the userquery_mgr.html page after successful deletion
+        },
+        error: function(xhr, status, error) {
+            alert("An error occurred while deleting the employee: " + error);
+        }
+    });
+}
+
+ // Call the function to fetch user data when the page is loaded
+$(document).ready(function () {
+    touserdata();
+    $("#addemp").click(addEmployee);
+});
+
+</script>
+</body>
+</html>

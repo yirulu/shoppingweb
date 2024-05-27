@@ -1,0 +1,432 @@
+    <!------------------------------------------原始Page----------------------------------------------->
+    <div class="container" id="orderManagementSection">
+        <div class="py-0">
+            <div class="container">
+                <div class="row w-100">
+                    <div class="" style=""><input readonly="readonly" class="mt-2 form-control-sm" type="text"></div>
+                    <div class="col-md-2 col-lg-2" style=""><a class="btn btn-primary mt-2" id="queryAll"
+                            href="#">查詢全部訂單</a></div>
+                    <div class="col-md-2 col-lg-3" style="">
+                        <form class="form-inline">
+                            <div class="input-group mt-2">
+                                <input type="text" class="form-control" id="userinputById">
+                                <div class="input-group-append"><button class="btn btn-primary" type="button"
+                                        id="querysorderId">依編號查詢</button></div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="col-md-2 col-lg-3" style="">
+                        <div class="form-group">
+                            <div class="input-group mt-2">
+                                <input type="date" class="form-control" id="userinputdate">
+                                <div class="input-group-append"><button class="btn btn-primary" id="queryBydate"
+                                        type="button">依日期查詢</button></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-lg-2" style="">
+                        <div class="form-group">
+                            <select class="form-control mt-2" id="statusSelect">
+                                <option value="">依狀態查詢</option>
+                                <option>準備中</option>
+                                <option>完成</option>
+                                <option>作廢</option>
+                            </select>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <div class="py-5">
+            <div class="container">
+                <div class="row">
+
+                    <div class="col-md-12">
+                        <h3 class="my-3">訂單管理</h3>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="table-responsive" style="">
+                            <table class="table table-striped table-borderless">
+                                <thead>
+                                    <tr>
+                                        <th scope="col"></th>
+                                        <th scope="col">訂單編號</th>
+                                        <th scope="col">日期</th>
+                                        <th class="w-20">狀態</th>
+                                        <th class="w-20">總金額</th>
+                                        <th class="w-25">寄送地址</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="orderListTable"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label>批次修改狀態：</label>
+                            <select class="form-control w-25" id="changeStatus">
+                                <option value="">請選擇</option>
+                                <option value="準備中">準備中</option>
+                                <option value="完成">完成</option>
+                                <option value="作廢">作廢</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!------------------------------------------原始Page----------------------------------------------->
+    <!------------------------------------------替換Page----------------------------------------------->
+    <div class="container" id="modifyOrderSection" style="display: none;">
+        <div>
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-12" style="">
+                        <h3 class="my-3">訂單修改</h3>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="table-responsive" style="">
+                            <table class="table table-striped table-borderless">
+                                <thead></thead>
+                                <tbody id="updateSales"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12"><a class="btn btn-primary" href="#" onclick="upPage()">返回上一頁<br></a>
+                        <a class="btn btn-primary mx-5" href="#" onclick="updateDetail(updatesorderId)">訂單明細修改</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!------------------------------------------替換Page----------------------------------------------->
+    <footer class="text-muted py-5">
+        <div class="container">
+            <p class="float-right">
+                <a href="#">Back to top</a>
+            </p>
+            <p>Album template is based on Bootstrap © examples.&nbsp; <br>New to Bootstrap? <a href="#">Visit the
+                    homepage</a>
+                or read our <a href="#">getting started guide</a>.</p>
+        </div>
+    </footer>
+    <script>
+        function showOrderList() {
+            $.ajax({
+                method: 'GET',
+                url: "http://localhost:8080/sales/queryDetail",
+                dataType: 'json',
+                success: OrderResult
+            });
+        }
+        function showList() {
+            $.ajax({
+                method: 'GET',
+                url: "http://localhost:8080/sales/querySales",
+                dataType: 'json',
+                success: result
+            });
+        }
+        function queryByDate() {
+            var selectedDate = $("#userinputdate").val();
+            $.ajax({
+                method: 'GET',
+                url: "http://localhost:8080/sales/querySalesByDate/" + selectedDate,
+                dataType: 'json',
+                success: result
+            });
+        }
+        function querysorderId() {
+            var selectedById = $("#userinputById").val();
+            $.ajax({
+                method: 'GET',
+                url: "http://localhost:8080/sales/querysorderId/" + selectedById,
+                dataType: 'json',
+                success: result2
+            });
+        }
+        function updateAddress() {
+            var newAddress = $(this).parent().prev().children('input').val();
+            var sorderId = $(this).parent().prev().prev().prev().prev().prev().text();
+
+            $.ajax({
+                method: 'POST',
+                url: "http://localhost:8080/sales/updateAddress/" + sorderId,
+                data: { address: newAddress },
+                success: function () {
+                    alert("地址已成功修改");
+                },
+                error: function () {
+                    alert("修改未完成請重試");
+                }
+            });
+        }
+        function queryByStatus() {
+            var selectedStatus = $("#statusSelect").val();
+            if (selectedStatus !== "") {
+                $.ajax({
+                    method: 'GET',
+                    url: "http://localhost:8080/sales/querySalesByStatus/" + selectedStatus,
+                    dataType: 'json',
+                    success: result
+                });
+            } else {
+                showList();
+            }
+        }
+        function batchStatusUpdate() {
+            var selectedStatus = $("#changeStatus").val();
+            $("input[type='checkbox']:checked").each(function () {
+                var sorderId = $(this).parent().next().text();
+                $.ajax({
+                    method: 'POST',
+                    url: "http://localhost:8080/sales/updateStatus/" + sorderId,
+                    data: { status: selectedStatus },
+                    success: function () {
+                        alert("狀態已成功修改");
+                        showList();
+                    },
+                    error: function () {
+                        alert("修改未完成請重試");
+                    }
+                });
+            });
+        }
+        function result(data) {
+            $("#orderListTable").empty();
+            var row = $('<th scope="col"><class="w-100 mt-2">');
+            $("#orderListTable").append(row);
+            $.each(data, function () {
+                var row = $("<tr></tr>");
+                $("<td><input type='checkbox' class='mt-2 w-100'></td>").appendTo(row);
+                $("<td>").text(this.sorderId).appendTo(row);
+                $("<td>").text(this.generateDate).appendTo(row);
+                $("<td>").text(this.statusCode).appendTo(row);
+                $("<td>").text(this.sorderPrice).appendTo(row);
+                $("<td class=''><input type='text' class='w-100' value='" + this.receiveAddress + "'></td>").appendTo(row);
+                $("<td>").append($('<a class="btn btn-primary mx-2 ml-4 updateAddressBtn" href="#">修改地址</a><a class="btn btn-primary ml-5" href="#"  onclick=changePage("' + this.sorderId + '")>修改訂單</a>')).appendTo(row);
+                $("#orderListTable").append(row);
+            });
+            $('.updateAddressBtn').click(updateAddress);
+        }
+        function result2(data) {
+            $("#orderListTable").empty();
+            var row = $('<th scope="col"><class="w-100 mt-2">');
+            $("#orderListTable").append(row);
+            var row = $("<tr></tr>");
+            $("<td><input type='checkbox' class='mt-2 w-100'></td>").appendTo(row);
+            $("<td>").text(data.sorderId).appendTo(row);
+            $("<td>").text(data.generateDate).appendTo(row);
+            $("<td>").text(data.statusCode).appendTo(row);
+            $("<td>").text(data.sorderPrice).appendTo(row);
+            $("<td class=''><input type='text' class='w-100' value='" + data.receiveAddress + "'></td>").appendTo(row);
+            $("<td>").append($('<a class="btn btn-primary mx-2 ml-4 updateAddressBtn" href="#">修改地址</a><a class="btn btn-primary ml-5" href="#"  onclick=changePage("' + data.sorderId + '")>修改訂單</a>')).appendTo(row);
+            $("#orderListTable").append(row);
+            $('.updateAddressBtn').click(updateAddress);
+        }
+        var updatesorderId;
+        function changePage(sorderId) {
+            $('#orderManagementSection').hide();
+            $('#modifyOrderSection').show();
+            $.ajax({
+                method: 'GET',
+                url: "http://localhost:8080/orderDetail/queryDetail/" + sorderId,
+                dataType: 'json',
+                success: function (data) {
+                    OrderResult(data);
+                    updatesorderId = sorderId;
+                },
+                error: function () {
+                    alert("X");
+                }
+            });
+        }
+
+        function upPage() {
+            $('#modifyOrderSection').hide();
+            $('#orderManagementSection').show();
+        }
+
+        var quantities = [];
+
+        let totalAmount = 0; // 初始化總金額=0
+        function OrderResult(data) {
+            $("#updateSales").empty();
+            var totalAmount = 0; // 初始化總金額為0
+            var totalRow = $("<tr></tr>");
+            var headerRow = $('<tr><th></th><th>商品編號</th><th>商品名稱</th><th>商品數量</th><th>單價</th><th>小計</th><th></th></tr>');
+            $("#updateSales").append(headerRow);
+
+            $.each(data, function () {
+                var subtotal = this.quantity * this.unitPrice;
+                totalAmount += subtotal;
+                var row = $("<tr></tr>");
+                $("<td>").text("").appendTo(row);
+                $("<td>").text(this.productId).appendTo(row);
+                $("<td>").text(this.pname).appendTo(row);
+                var inputField = $("<input id=" + this.sdetailId + " type='number' min='0' class='w-25' value='" + this.quantity + "' oninput='updateSubtotal(this)'>");
+                inputField.attr('data-previous-value', this.quantity);
+                $("<td class=''></td>").append(inputField).appendTo(row);
+                $("<td>").text(this.unitPrice).appendTo(row);
+                $("<td>").text(subtotal).appendTo(row);
+                $("<td>").append($('<a class="btn btn-primary" href="#" onclick=deleteDetail("' + this.sdetailId + '")>單筆刪除</a>')).appendTo(row);
+                $("#updateSales").append(row);
+            });
+            var row2 = $("<tr id='totalRow'></tr>");
+            $("<td>").text("").appendTo(row2);
+            $("<td>").text("").appendTo(row2);
+            $("<td>").text("").appendTo(row2);
+            $("<td>").text('總金額：').appendTo(row2);
+            $("<td>").text("").appendTo(row2);
+            $("<td>").text(totalAmount).appendTo(row2);
+            $("<td>").text("").appendTo(row2);
+            $("#updateSales").append(row2);
+
+        }
+        function updateTotalAmount() {            
+            var totalAmount = 0;
+            var rowCount = $('#updateSales').find('tr').length;
+            console.log(rowCount);
+            for(var i=1;i<rowCount-1;i++){
+                var row=$('#updateSales tr:eq("'+i+'")');
+                subtotal = parseInt(row.find("td:eq(5)").text());
+                // console.log(this);
+                console.log(subtotal);
+                totalAmount += subtotal;
+                // if (!isNaN(subtotal)) {
+                //     totalAmount += subtotal;
+                // }
+            }
+            // $("#updateSales").each(function () {
+            //     var subtotal=[];
+            //     subtotal = parseFloat($(this).filter("td:eq(5)").text());
+            //     // console.log(this);
+            //     console.log(subtotal);
+            //     if (!isNaN(subtotal)) {
+            //         totalAmount += subtotal;
+            //     }
+            // });
+            $("#totalRow td:eq(5)").text(totalAmount.toFixed());
+        }
+        function updateSubtotal(input) {
+            // console.log(input);
+            var row = $(input).closest("tr");
+            var unitPrice = parseFloat(row.find("td:eq(4)").text());
+            var quantity = parseInt($(input).val());
+            console.log(quantity);
+            var subtotal = unitPrice * quantity;
+            quantities = [];
+            quantities.push(quantity);
+            // console.log(quantities);
+            row.find("td:eq(5)").text(subtotal);            
+            updateTotalAmount();
+        }
+        function deleteDetail(sdetailId) {
+            //alert(sdetailId);
+            $.ajax({
+                method: 'POST',
+                url: "http://localhost:8080/orderDetail/deleteDetail?id=" + sdetailId,
+                success: function () {
+
+                    alert("删除成功");
+                    //refreshOrderDetail(sorderId);
+                },
+                error: function () {
+                    alert("删除失败");
+                }
+            });
+        }
+        // function refreshOrderDetail(sorderId) {
+        //     $.ajax({
+        //         method: 'GET',
+        //         url: "http://localhost:8080/orderDetail/queryDetail/" + sorderId,
+        //         dataType: 'json',
+        //         success: function (data) {
+        //             OrderResult(data);
+        //         },
+        //         error: function () {
+        //             alert("X");
+        //         }
+        //     });
+        // }
+
+        function updateDetail() {
+            console.log();
+            var updatedDetails = [];
+            $("#updateSales tbody tr").each(function () {
+                var $inputField = $(this).find("input[type='number']");
+                var sdetailId = $inputField.attr("id");
+                var currentQuantity = parseInt($inputField.val());
+                var previousQuantity = parseInt($inputField.attr("data-previous-value"));
+                if (!isNaN(currentQuantity) && currentQuantity !== previousQuantity) {
+                    var detail = {
+                        "sdetailId": sdetailId,
+                        "quantity": currentQuantity
+                    };
+                    updatedDetails.push(detail);
+                }
+            });
+            $.ajax({
+                method: 'POST',
+                url: "http://localhost:8080/orderDetail/updateDetail/" + updatesorderId,
+                contentType: "application/json",
+                data: JSON.stringify(updatedDetails),
+                success: function (response) {
+                    alert('訂單明細修改成功！');
+                },
+                error: function () {
+                    alert('訂單明細修改失敗！');
+                }
+            });
+        }
+
+        $(document).ready(function () {
+            $('#queryAll').click(showList);
+            $('#queryBydate').click(queryByDate);
+            $('#querysorderId').click(querysorderId);
+            $('#statusSelect').change(queryByStatus);
+            $('#changeStatus').change(function () {
+                var selectedStatus = $(this).val();
+                if (selectedStatus !== "") {
+                    var sorderIds = [];
+                    $("input[type='checkbox']:checked").each(function () {
+                        sorderIds.push($(this).parent().next().text());
+                    });
+                    if (sorderIds.length > 0) {                        
+                        $.ajax({
+                            method: 'POST',
+                            url: "http://localhost:8080/sales/updateStatus/" + selectedStatus+"/"+sessionStorage.getItem("employeeID"),
+                            contentType: "application/json",
+                            data: JSON.stringify(sorderIds),
+                            success: function () {
+                                alert("狀態已成功修改");
+                                showList();
+                            },
+                            error: function () {
+                                alert("修改未完成請重試");
+                            }
+                        });
+                    } else {
+                        alert("請選擇要修改狀態的訂單");
+                    }
+                }
+            });
+            $("#updateSales tbody").on("input", "input[type='number']", function () {
+                updateSubtotal(this);
+
+            });
+        });
+    </script>
+</body>
+
+</html>

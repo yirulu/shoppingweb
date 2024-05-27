@@ -1,0 +1,280 @@
+<!-- CSS dependencies -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" type="text/css">
+<link rel="stylesheet" href="wireframe.css" type="text/css">
+
+<div class="container" id="productContainer">
+  <div class="row">
+    <div class="col-md-12">
+      <div class="row">
+        <div class="col-md-12">
+          <h3 class="my-3">商品管理</h3>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="my-3 col-md-4"><a href="#" onclick="addProductView()" class="btn btn-primary mr-3" id="createemployee">新增商品</a>
+      <a href="#" onclick="showProductList()" class="btn btn-primary mx-3">查詢所有商品</a></div>
+    <div class="col-md-2">
+      <div class="form-group">
+        <label>Select Type</label><select class="form-control" id="selecttype">
+          <option id="PT1000" value="PT1000">書寫筆類</option>
+          <option value="PT2000" id="PT2000">紙品類</option>
+          <option value="PT3000" id="PT3000">文具用品</option>
+          <option value="PT4000" id="PT4000">辦公用品</option>
+        </select></div>
+    </div>
+    <div class="my-3 col-md-2"><a href="#" onclick="showProductListByTypeId()" class="btn btn-primary ml-2" id="createemployee">依商品大類查詢</a></div>
+  </div>
+</div>
+<div class="container" id="addProductContainer">
+
+</div>
+<div class="container" id="productListContainer">
+<div class="row">
+  <div class="col-md-12">
+    <div class="table-responsive">
+      <table class="table table-striped table-borderless" style="display:'';" id="producttable">
+        
+      </table>
+    </div>
+  </div>
+</div>
+</div>
+<div class="container">
+  <!--換頁按鈕-->
+    <div class="row mx-5">
+      <div class="col-md-12">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="row">
+              <div class="col-md-4"></div>
+              <div class="col-md-4">
+                <ul class="pagination mx-5" id="productPagination1">
+                  <!-- <li class="page-item"> <a class="page-link" href="#"> <span>«</span></a> </li>
+                  <li class="page-item active"> <a class="page-link" href="#">1</a> </li>
+                  <li class="page-item"> <a class="page-link" href="#">2</a> </li>
+                  <li class="page-item"> <a class="page-link" href="#">3</a> </li>
+                  <li class="page-item"> <a class="page-link" href="#">4</a> </li>
+                  <li class="page-item"> <a class="page-link" href="#">5</a> </li>
+                  <li class="page-item"> <a class="page-link" href="#">6</a> </li>              
+                  <li class="page-item"> <a class="page-link" href="#"> <span>»</span></a> </li> -->
+                </ul>
+              </div>
+              <div class="col-md-4"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+  function showProductList() { 
+    $.ajax({
+      method: 'GET',
+      url: "http://localhost:8080/products",
+      dataType: 'json',
+      success: showproduct
+    });
+  } 
+
+  function showProductListByTypeId()
+  {
+    var selectType = $("#selecttype").val();
+    if(selectType!==null)
+    {
+      $.ajax({
+      method: 'GET',
+      url: "http://localhost:8080/products/bypmaintypeid/"+selectType,
+      dataType: 'json',
+      success: showproduct
+    });
+    }
+  }  
+
+  function addProductView()
+  {
+    $("#productContainer").hide();
+    $("#addProductContainer").show();
+    $("#addProductContainer").empty();
+    $("#addProductContainer").append("<div class='row'><div class='mx-auto col-lg-6'><h2 class='justify-content-between my-3'>新增商品</h2><form class='text-left'><div class='form-group'><label for='form16' class='pr-4'>Choose Type Group&nbsp;</label><select class='form-control' onchange='showProductType(this.value)' id='selectTypeToAdd'><option id='PT1000' value='PT1000'>書寫筆類</option><option id='PT2000' value='PT2000'>紙品類</option><option id='PT3000' value='PT3000'>文具用品</option><option id='PT4000' value='PT4000'>辦公用品</option></select></div><div class='form-group'><label for='form16' class='pr-4'>Choose Type&nbsp;</label><select class='form-control' id='selectTypeOption'></select> </div><div class='form-group'><label for='form17'>Product Name</label><input type='text' class='form-control' id='p_name'></div><div class='form-group'><label for='form18'>Product description&nbsp;</label><input type='text' class='form-control' id='p_text'> </div><div class='form-row'><div class='form-group col-md-6'><label for='form19'>Price</label><input type='number' min ='0' class='form-control' id='p_price'></div><div class='form-group col-md-6'><label for='form20'>Quantity</label><input type='number' min ='0' class='form-control' id='p_qty'></div></div><button type='button' class='btn btn-primary px-3' onclick='addProduct()'>Submit </button><button type='button' class='btn btn-primary px-3 ml-3' onclick='CleanForm()'>Clean</button><button type='button' class='btn btn-primary px-3 ml-3' onclick='CancelAdd()'>Cancel</button></form></div></div></div>");
+    $("#productListContainer").hide();
+    showProductType();
+  }
+
+  function showProductType(type)
+  {
+    // var type = $("#selectTypeToAdd").val();
+    if(type!==null)
+    {
+      //alert(type);
+      $.ajax({
+      method: 'GET',
+      url: "http://localhost:8080/productstype/bypmaintypeid/"+type,
+      dataType: 'json',
+      success: (data)=>{
+        //alert(data);
+        $("#selectTypeOption").empty();
+        $.each(data,function() {          
+          $("#selectTypeOption").append($("<option value='"+this.ptypeid+"'></option>").text(this.ptypename));
+        })       
+      }
+      });
+     }
+  }
+
+  function addProduct(productId)
+  {
+    var methodUse="";
+    var urlUse="";
+    if(productId===null)
+    {
+      methodUse="POST";
+      urlUse="http://localhost:8080/products/add";
+    }
+    else
+    {
+      methodUse="PUT";
+      urlUse="http://localhost:8080/products/update/"+productId;
+    }
+    
+    
+    var Product = {};
+    Product.pname=$("#p_name").val();
+    Product.ptext=$("#p_text").val();
+    Product.unitprice=$("#p_price").val();
+    Product.pqty=$("#p_qty").val();
+    Product.ptypeid=$("#selectTypeOption").val();
+    Product.employeeid=sessionStorage.getItem("loginUser");
+
+    $.ajax({
+      method: methodUse,
+      url: urlUse,
+      data: JSON.stringify(Product),
+      dataType: 'html',
+      contentType : 'application/json',
+      success: function (data, textStatus, jqXHR) {
+                  console.log(textStatus); 
+                  if(methodUse==="POST")
+                  {
+                    alert("新增成功!");
+                  }
+                  else
+                  {
+                    alert("修改成功!");
+                  }                  
+              },
+              error: function (jqXHR, textStatus, errorThrown) {
+                  // 登錄失敗，處理錯誤
+                  if(methodUse==="POST")
+                  {
+                    if (jqXHR.status === 404) {
+                        alert('新增失敗');
+                    } else {
+                        alert('新增失敗：' + errorThrown);
+                    }
+                  }
+                  else
+                  {
+                    if (jqXHR.status === 404) {
+                        alert('修改失敗');
+                    } else {
+                        alert('修改失敗：' + errorThrown);
+                    }
+                  }
+              }
+    });
+  }
+  
+
+  function CleanForm()
+  {
+    $("#p_name").val("");
+    $("#p_text").val("");
+    $("#p_price").val("");
+    $("#p_qty").val(""); 
+  }
+
+  function CancelAdd()
+  {
+    $("#productContainer").show();
+    $("#addProductContainer").hide();
+    $("#productListContainer").show();
+    showProductList();
+  }
+  
+  function productupdate(productId)
+  {
+    $("#productContainer").hide();
+    $("#addProductContainer").show();
+    $("#addProductContainer").empty();
+    $("#addProductContainer").append("<div class='row'><div class='mx-auto col-lg-6'><h2 class='justify-content-between my-3'>修改商品</h2><form class='text-left'><div class='form-group'><label for='form16' class='pr-4'>Choose Type Group&nbsp;</label><select class='form-control' onchange='showProductType(this.value)' id='selectTypeToAdd'><option id='PT1000' value='PT1000'>書寫筆類</option><option id='PT2000' value='PT2000'>紙品類</option><option id='PT3000' value='PT3000'>文具用品</option><option id='PT4000' value='PT4000'>辦公用品</option></select></div><div class='form-group'><label for='form16' class='pr-4'>Choose Type&nbsp;</label><select class='form-control' id='selectTypeOption'></select> </div><div class='form-group'><label for='form17'>Product Name</label><input type='text' class='form-control' id='p_name'></div><div class='form-group'><label for='form18'>Product description&nbsp;</label><input type='text' class='form-control' id='p_text'> </div><div class='form-row'><div class='form-group col-md-6'><label for='form19'>Price</label><input type='number' min ='0' class='form-control' id='p_price'></div><div class='form-group col-md-6'><label for='form20'>Quantity</label><input type='number' min ='0' class='form-control' id='p_qty'></div></div><button type='button' class='btn btn-primary px-3' onclick=addProduct('"+productId+"')>Submit </button><button type='button' class='btn btn-primary px-3 ml-3' onclick='CancelAdd()'>Cancel</button></form></div></div></div>");
+    $("#productListContainer").hide();
+
+    $.ajax({
+      method: 'GET',
+      url: "http://localhost:8080/products/"+productId,
+      dataType: 'json',
+      success:(data)=>{
+        $("#p_name").val(data.pname);
+        $("#p_text").val(data.ptext);
+        $("#p_price").val(data.unitprice);
+        $("#p_qty").val(data.pqty);        
+        const maintype = (data.ptypeid).substring(0, 3)+"000";
+        showProductType(maintype);
+        $("#selectTypeToAdd").val(maintype);
+        $("#selectTypeOption").val(data.ptypeid);
+      }
+    })    
+  }
+
+  function productdelete(productId)
+  {
+    $.ajax({
+      method: 'DELETE',
+      url: "http://localhost:8080/products/"+productId,
+      dataType: 'html',
+      success:function (data, textStatus, jqXHR) {
+                  console.log(data); 
+                  alert("刪除成功!");
+              },
+              error: function (jqXHR, textStatus, errorThrown) {
+                  // 登錄失敗，處理錯誤
+                  if (jqXHR.status === 404) {
+                      alert('刪除失敗');
+                  } else {
+                      alert('刪除失敗：' + errorThrown);
+                  }
+              }
+    });
+  }
+  
+  function showproduct(data) {
+    //alert("show");
+
+    $("#producttable").empty();
+    var row = $('<thead class="text-center"><tr><th scope="col" style="" class="w-20">Product ID</th><th scope="col" class="" contenteditable="true">product</th><th scope="col">Description</th><th scope="col">Price</th><th scope="col" style="" contenteditable="true">Quanity</th><th scope="col">Update / Delete</th></tr></thead>');
+    $("#producttable").append(row);
+    var body=$("<tbody id='tbody'></tbody>")
+    $("#producttable").append(body);
+    $.each(data, function () {
+      var row = $("<tr></tr>");
+      $("<th class='text-center' scope='row' class=''></th>").text(this.productid).appendTo(row);
+      $("<td class='w-25'></td>").text(this.pname).appendTo(row);
+      $("<td class='w-25'></td>").text(this.ptext).appendTo(row);
+      $("<td class='text-center'></td>").text(this.unitprice).appendTo(row);
+      $("<td class='text-center'></td>").text(this.pqty).appendTo(row);     
+      $("<td class='text-center'></td>").append($("<a class='btn btn-primary ' onclick=productupdate('"+this.productid+"')>Update</a><a class='btn btn-primary ml-2' onclick=productdelete('"+this.productid+"')>Delete</a>")).appendTo(row);
+      $("#tbody").append(row);
+    });
+  }
+  
+  $(document).ready(()=>{
+    showProductList();
+    
+    });  
+    
+</script>

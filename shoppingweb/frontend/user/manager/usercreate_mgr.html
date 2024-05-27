@@ -1,0 +1,77 @@
+<div class="row" >
+    <div class="mx-auto col-lg-6">
+      <h2 class="justify-content-between my-3">員工基本資料新增</h2>
+      <form class="text-left" style="">
+        <div class="form-group"> <label for="form16">Employee ID</label> <input type="text" class="form-control" readonly="readonly" placeholder="自動產生" id="employeeID"> </div>
+        <div class="form-group"> <label for="form17">Employee Name</label> <input type="text" class="form-control" id="name"> </div>
+        <div class="form-group"> <label for="form18">Employee Email</label> <input type="email" class="form-control" id="email"> </div>
+        <div class="form-group"> <label for="form18">Employee UserName</label> <input type="text" class="form-control" id="userName" required="required"> </div>
+        <div class="form-row">
+          <div class="form-group col-md-6"> <label for="form19">Password</label> <input type="password" class="form-control" id="password1" required="required"> </div>
+          <div class="form-group col-md-6"> <label for="form20">Confirm Password</label> <input type="password" class="form-control" id="password2" required="required"> </div>
+        </div><button type="submit" class="btn btn-primary px-3" id="useradd">Submit </button>
+        <button type="submit" class="btn btn-primary px-3 ml-3" id="CleanForm">Clean</button>
+        <button type="submit" class="btn btn-primary px-3 ml-3" id="Cancel">Cancel</button>
+      </form>
+    </div>
+  </div>
+  <script>
+ 
+    function useradd(evt) {
+        evt.preventDefault();
+        dataUrl = "http://localhost:8080/users";
+
+        var obj = {};
+        
+        obj.name = $("#name").val();
+        obj.email = $("#email").val();
+        obj.userName = $("#userName").val();
+        obj.password = $("#password1").val();
+        if(obj.password != $("#password2").val()){
+          alert("The passwords are inconsistent, please re-enter");
+        } else if (obj.name.trim().length === 0){ 
+          alert("Please enter name");
+        } else if (obj.email.trim().length === 0){ 
+          alert("Please enter email");
+        } else if (obj.userName.trim().length === 0){ 
+          alert("Please enter userName");
+        } else if (obj.password.trim().length === 0){ 
+          alert("Please enter password");
+
+        } else {
+         $.ajax({
+            method: 'post',
+            url: dataUrl,	//設定資料的網址               
+            contentType: 'application/json',                 
+            data: JSON.stringify(obj),
+            dataType: "html",	//設定回傳的資料格式
+            success: function(response) {
+          		alert("New employee has been added successfully.");
+              $.get("./user/manager/userquery_mgr.html", setmainspace);
+      	  	},
+          	error: function(xhr, status, error) {
+      		    alert("An error occurred while adding the user: " + error);
+          	}
+          });
+        }
+    }
+    function CleanForm() {
+      $("#name").val("");
+      $("#email").val("");
+      $("#userName").val("");
+      $("#password1").val(""); 
+      $("#password2").val(""); 
+   
+    } 
+    function Cancel() {
+      $.get("./user/manager/userquery_mgr.html", setmainspace);
+      getfunctionlist_user();
+    } 
+
+    $(document).ready(function() {
+        $("#useradd").click(useradd);
+        $("#CleanForm").click(CleanForm);
+        $("#Cancel").click(Cancel);
+   });
+</script>
+ 

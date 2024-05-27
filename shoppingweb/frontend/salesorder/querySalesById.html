@@ -1,0 +1,102 @@
+<!-- CSS dependencies -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" type="text/css">
+<link rel="stylesheet" href="wireframe.css">  
+
+    <div class="container" id="mainspace">
+      <div class="row">
+        <div class="col-md-12">
+          <h3 id="title" class="my-3">歷史訂單</h3>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+          <div class="table-responsive" style="">
+            <table class="table table-striped table-borderless" id="orderListTable">
+             
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12"><a class="btn btn-primary mx-5" style="display: ''"; id="returnhistory" onclick="showList()">上一頁</a></div>
+      </div>
+    </div>
+  </div>
+  <footer class="text-muted py-5">
+    <div class="container">
+      <p class="float-right">
+        <a href="#">Back to top</a>
+      </p>
+      <p>Album template is based on Bootstrap © examples.&nbsp; <br>New to Bootstrap? <a href="#">Visit the homepage</a> or read our <a href="#">getting started guide</a>.</p>
+    </div>
+  </footer>
+  <script>
+     function showList() {
+      var mid=sessionStorage.getItem('memberId');
+      $.ajax({
+        method: 'GET',
+        url: "http://localhost:8080/sales/querySalesById/"+mid,
+        dataType: 'json',
+        success: showhistory
+      });
+    }    
+    function queryDetail(sorderid)
+    {      
+        $.ajax({
+          method:'GET',
+          url:'http://localhost:8080/orderDetail/queryDetail/'+sorderid,
+          dataType:'json',
+          success:showDetail          
+        });
+    }
+    function showDetail(data) {
+      document.getElementById('returnhistory').style.display="";      
+      $("#title").text("訂單詳細資料 : "+data[0].sorderId);
+      $("#orderListTable").empty();
+      var row = $('<thead><tr><th scope="col"></th><th scope="col">明細編號</th><th scope="col">商品編號</th><th scope="col">商品名稱</th><th>商品數量</th><th>單價</th><th>小計</th></th></tr></thead>');
+      $("#orderListTable").append(row);
+      var body=$("<tbody id='tbody2'></tbody>")
+      $("#orderListTable").append(body);
+      $.each(data, function () {        
+        var row = $("<tr></tr>");
+        $("<td></td>").text("").appendTo(row);
+        $("<td></td>").text(this.sindex).appendTo(row);
+        $("<td></td>").text(this.productId).appendTo(row);
+        $("<td></td>").text(this.pname).appendTo(row);
+        $("<td></td>").text(this.quantity).appendTo(row);
+        $("<td></td>").text(this.unitPrice).appendTo(row);
+        $("<td></td>").text(this.subTotal).appendTo(row);       
+        $("#tbody2").append(row);
+      });
+
+      // $("#mainspace").empty();
+      // $("#mainspace").html($("#orderListTable"));
+    }
+    
+    function showhistory(data) {
+      document.getElementById('returnhistory').style.display="none";
+      $("#title").text("歷史訂單");
+      $("#orderListTable").empty();
+      var row = $('<thead><tr><th scope="col"></th><th scope="col">訂單編號</th><th scope="col">日期</th><th>狀態</th><th>單價</th><th>小計</th><th>寄送地址</th><th style="" class=""></th></tr></thead>');
+      $("#orderListTable").append(row);
+      var body=$("<tbody id='tbody1'></tbody>")
+      $("#orderListTable").append(body);
+      $.each(data, function () {
+        var tag= $("<a class='btn btn-primary mx-2 ml-4' onclick=queryDetail('"+this.sorderId+"')>訂單明細</a>");
+        var row = $("<tr></tr>");
+        $("<td></td>").text("").appendTo(row);
+        $("<td></td>").text(this.sorderId).appendTo(row);
+        $("<td></td>").text(this.generateDate).appendTo(row);
+        $("<td></td>").text(this.statusCode).appendTo(row);
+        $("<td></td>").text(this.sorderPrice).appendTo(row);
+        $("<td></td>").text(this.sorderPrice).appendTo(row);
+        $("<td></td>").text(this.receiveAddress).appendTo(row);
+        $("<td></td>").append(tag).appendTo(row);
+        $("#tbody1").append(row);
+      });
+    }
+
+    $(document).ready(showList);
+  </script>
+</body>
+</html>

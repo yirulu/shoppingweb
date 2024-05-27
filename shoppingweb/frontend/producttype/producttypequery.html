@@ -1,0 +1,144 @@
+ <!-- CSS dependencies -->
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" type="text/css">
+ <link rel="stylesheet" href="wireframe.css" type="text/css">
+ 
+<div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="btn-group"> </div>
+      </div>
+    </div>
+  </div>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="row">
+          <div class="col-md-12">
+            <h3 class="my-3">商品類別管理</h3>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="my-3 col-md-12"><a href="#" 
+        class="btn btn-primary" id="addType">新增商品
+        類別</a></div>
+    </div>
+  </div>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="table-responsive">
+          <table class="table table-striped table-borderless" id="message">
+            <thead class="text-center">
+              <tr>
+                <th scope="col" style="" class="w-20">Product Type</th>
+                <th scope="col" class="">Product Type Name</th>
+                <th scope="col" class="">Update / Delete</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row" class="">1</th>
+                <td class="h-10"></td>
+                <td class="w-25"></td>
+                <td></td>
+                <td></td>
+                <td class="">
+                  <a class="btn btn-info ml-5 mr-2 update-type" href="#" id="updatetype">Update</a>
+                  <a class="btn btn-info ml-2 mr-2 delete-type" href="#" id="deletetype">Delete</a>
+                </td>
+              </tr>
+              <tr>
+                <th scope="row" class="">2</th>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>
+                  <a class="btn btn-info ml-5 mr-2 update-type" href="#">Update</a>
+                  <a class="btn btn-info ml-5 ml-2 delete-type" href="#">Delete</a>
+                </td>
+
+              </tr>
+             </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+
+  function totypedata(){
+    $.ajax({
+      method:"GET",
+      url: "http://localhost:8080/productstypes",
+     dataType: 'json',
+     success: function(data){
+      showAll(data);
+     }
+    });
+  }
+
+  function showAll(data){
+    $("#message").empty();
+    var div=$("<div class=>")
+      var firstRow =
+      $("<tr><th>Type ID</th><th>Type Name</th><th>Update / Delete</th></tr>");
+      $("#message").append(firstRow);
+
+      $.each(data,function(i){
+        var row = $("<tr></tr>");
+        var td1 = $("<td></td>").text(this.ptypeid).appendTo(row);
+        var td2 = $("<td></td>").text(this.ptypename).appendTo(row);
+        var td3 = $("<td></td>").html(
+            '<a class="btn btn-info ml-5 mr-2 update-type" href="#" data-type-id="' + this.ptypeid + '">Update</a>'
+            +'<a class="btn btn-info ml-2 delete-type" href="#" id="deletetype">Delete</a>').appendTo(row);
+        $("#message").append(row);
+      });
+      $(".update-type").click(updateType);
+
+  }
+  function showMessage(data){
+    alert(JSON.stringify(data));
+  }
+  function addType(){
+    $.get("./producttype/producttypecreate.html", setmainspace);
+   }
+
+
+
+function updateType(){
+  var ptypeid = $(this).data("type-id");
+    sessionStorage.setItem('ptypeid', ptypeid);
+    $.get("./producttype/producttypeupdate.html", setmainspace);
+
+}
+
+  function deleteType(evt){
+    evt.preventDefault();
+    var ptypeid = $(this).closest("tr").find("td:first").text();
+    var dataUrl = "http://localhost:8080/productstype/delete/" + ptypeid;
+    $.ajax({
+        method: 'DELETE',
+        url : dataUrl,
+        success: function(response) {
+            alert("Type with ID: " + ptypeid + " has been deleted successfully.");
+             $.get("./producttype/producttypequery.html", setmainspace); // Call the userquery_mgr.html page after successful deletion
+        },
+        error: function(xhr, status, error) {
+          alert("An error occurred while deleting the type: " + error);
+        }  
+      });
+  }
+  $(document).ready(function(){
+    totypedata();
+    $("#addType").click(addType);
+ 
+  });
+
+</script>

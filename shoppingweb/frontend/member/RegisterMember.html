@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" ng-app="myApp">
+
+<head>
+    <meta charset="UTF-8">
+    <title>會員註冊</title>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" type="text/css">
+    <link rel="stylesheet" href="wireframe.css" type="text/css">
+
+</head>
+
+<body>
+    <div class="container" ng-controller="myCtrl">
+    <div class="row">
+    <div class="mx-auto col-md-6 bg-white p-5">
+
+        <h1>會員註冊</h1>
+        <form id="memberForm" ng-submit="submitForm()">
+            <div>
+                <label style="width:70px;">Email:</label>
+                <input type="email" name="email" ng-model="member.email" required />
+                <label style="color: blue; font-size: smaller;">唯一登入帳號用</lable> 
+            </div>
+            <div>
+                <label style="width:70px;">姓名:</label>
+                <input type="text" name="name" ng-model="member.name" required />
+            </div>
+            <div>
+                <label style="width:70px;">密碼:</label>
+                <input type="password" name="password" ng-model="member.password"
+                    pattern="^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$" required />
+                <label style="color: blue; font-size: smaller;">至少8碼含括大小寫與數字</lable> 
+            </div>
+            <div>
+                <label style="width:70px;">地址:</label>
+                <input type="text" name="address" ng-model="member.address" required />
+            </div>
+            <div>
+                <label style="width:70px;">手機號碼:</label>
+                <input type="tel" name="mobile" ng-model="member.mobile" pattern="^09\d{8}$" required />
+                <label style="color: blue; font-size: smaller;">手機號09xxxxxxxx(10碼數字)</lable> 
+            </div>
+            <div>
+                <label style="width:70px;">生日:</label>
+                <input type="text" name="birthday" ng-model="member.birthday" pattern="^(19|20)\d{2}[01]\d[0-3]\d$"
+                    required />
+                <label style="color: blue; font-size: smaller;">西元年YYYYMMDD(ex:19701231)</lable> 
+            </div>
+            <div>
+                <label>身分證後五碼</label>
+                <input type="text" name="nid" ng-model="member.nid" pattern="^\d{5}$" required />
+                <label style="color: blue; font-size: smaller;">五碼數字以利後續忘記密碼可以進行驗證</lable> 
+            </div>
+            <button type="submit" class="btn btn-primary btn-rounded" style="width:100px;" ng-disabled="isValidForm()">註冊</button>
+            <span style="margin-right:60px;"></span>
+            <button type="button" class="btn btn-primary btn-rounded" style="width:100px;"
+                onclick="window.location.href='http://127.0.0.1:5500/shoppingweb/index.html'">
+                取消註冊</button>
+        </form>
+    </div></div></div>
+    
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+
+    <script>
+        var app = angular.module('myApp', []);
+        app.controller('myCtrl', function ($scope, $http) {
+            $scope.member = { active: true };
+            $scope.member = {};
+            $scope.emailInvalid = false;
+            $scope.passwordInvalid = false;
+            $scope.mobileInvalid = false;
+            $scope.birthdayInvalid = false;
+            $scope.nidInvalid = false;
+            // Initially disable the submit button
+            $scope.submitDisabled = true;
+
+            $scope.isValidForm = function () {
+                return !$scope.emailInvalid && !$scope.passwordInvalid && !$scope.mobileInvalid && !$scope.birthdayInvalid && !$scope.nidInvalid;
+            };
+
+            $scope.submitForm = function () {
+                // Validate email format
+                $scope.emailInvalid = !/\S+@\S+\.\S+/.test($scope.member.email);
+                // Validate password format
+                $scope.passwordInvalid = !/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/.test($scope.member.password);
+                // Validate mobile format
+                $scope.mobileInvalid = !/^09\d{8}$/.test($scope.member.mobile);
+                // Validate birthday format
+                $scope.birthdayInvalid = !/^(19|20)\d{2}[01]\d[0-3]\d$/.test($scope.member.birthday);
+                // Validate NID format
+                $scope.nidInvalid = !/^\d{5}$/.test($scope.member.nid);
+
+                // Enable submit button only when all checks are successful
+                $scope.submitDisabled = !$scope.isValidForm();
+
+                // if (!$scope.emailInvalid && !$scope.passwordInvalid && !$scope.mobileInvalid && !$scope.birthdayInvalid && !$scope.nidInvalid) {
+                //     $scope.member.active = true;
+                    $.ajax({
+                        type: 'POST',
+                        url: 'http://localhost:8080/member',
+                        data: JSON.stringify($scope.member),
+                        contentType: 'application/json',
+                        success: function (response) {
+                            alert('成功註冊了，可到會員登入驗證');
+                            // Redirect to another page or show success message
+                            // location.href = "http://127.0.0.1:5500/shoppingweb/index.html";   
+                        },
+                        error: function (error) {
+                            alert('Registration failed: ' + error.responseJSON.message);
+                            // location.href = "http://127.0.0.1:5500/shoppingweb/index.html";   
+                        }
+                    });
+                // }
+            };
+        });
+    </script>
+</body>
+
+</html>
